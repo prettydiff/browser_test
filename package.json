@@ -1,0 +1,49 @@
+{
+    "author": "Austin Cheney",
+    "bin": "./bin/drial",
+    "bugs": {
+        "url": "https://github.com/prettydiff/drial/issues"
+    },
+    "command": "drial",
+    "description": "End-to-end test automation in the browser.",
+    "devDependencies": {
+        "@types/node": "^14.14.20",
+        "@typescript-eslint/eslint-plugin": "^4.20.0",
+        "@typescript-eslint/parser": "^4.20.0",
+        "eslint": "^7.23.0",
+        "typescript": "^4.2.3"
+    },
+    "directories": {
+        "bin": "./bin",
+        "doc": "./documentation",
+        "lib": "./lib",
+        "test": "./lib/terminal/test"
+    },
+    "keywords": [
+        "file",
+        "system",
+        "file system",
+        "share",
+        "peer to peer",
+        "gui",
+        "explorer",
+        "private",
+        "privacy"
+    ],
+    "license": "AGPL-3.0-only",
+    "main": "js/lib/application.js",
+    "name": "drial",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/prettydiff/drial.git"
+    },
+    "scripts": {
+        "prepublishOnly": "node js/application test",
+        "prerestart": "node js/application build",
+        "restart": "node js/application drial",
+        "start": "node js/application drial",
+        "test": "node js/application test"
+    },
+    "type": "module",
+    "version": "0.0.1"
+}
