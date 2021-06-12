@@ -4,7 +4,6 @@
 import build from "../commands/build.js";
 import commands from "../commands/commands.js";
 import directory from "../commands/directory.js";
-import drial from "../commands/drial.js";
 import get from "../commands/get.js";
 import lint from "../commands/lint.js";
 import mkdir from "../commands/mkdir.js";
@@ -17,7 +16,6 @@ const commandList:commandList = {
     build: build,
     commands: commands,
     directory: directory,
-    drial: drial,
     get: get,
     lint: lint,
     mkdir: mkdir,

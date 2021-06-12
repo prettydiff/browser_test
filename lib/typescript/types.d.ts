@@ -2,7 +2,7 @@
 
 type browserDOM = [domMethod, string, number];
 type buildPhase = "commands" | "configurations" | "libReadme" | "lint" | "typescript" | "version";
-type commands = "build" | "commands" | "directory" | "drial" | "get" | "lint" | "mkdir" | "remove" | "test" | "update" | "version";
+type commands = "build" | "commands" | "directory" | "get" | "lint" | "mkdir" | "remove" | "test" | "update" | "version";
 type directoryItem = [string,"directory" |  "error" | "file" | "link", string, number, number, directoryData];
 type directoryMode = "array" | "hash" | "list" | "read" | "search";
 type directoryResponse = directoryList | "missing" | "noShare" | "readOnly";

@@ -1,12 +1,12 @@
 /* lib/application - The entry point to the application. */
 
-import commandName from "./terminal/utilities/commandName.js";
-import commandList from "./terminal/utilities/commandList.js";
-import commands_documentation from "./terminal/utilities/commands_documentation.js";
-import error from "./terminal/utilities/error.js";
-import vars from "./terminal/utilities/vars.js";
+import commandName from "./lib/terminal/utilities/commandName.js";
+import commandList from "./lib/terminal/utilities/commandList.js";
+import commands_documentation from "./lib/terminal/utilities/commands_documentation.js";
+import error from "./lib/terminal/utilities/error.js";
+import vars from "./lib/terminal/utilities/vars.js";
 
-import disallowed from "./common/disallowed.js";
+import disallowed from "./lib/common/disallowed.js";
 
 (function terminal_init():void {
     // global

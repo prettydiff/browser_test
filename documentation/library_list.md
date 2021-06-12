@@ -5,8 +5,7 @@ This is a dynamically compiled list of supporting code files that comprise this 
 
 * Directory *[../documentation](../documentation)*
    - **[commands.md](commands.md)**                                                                                 - This documentation describes the various supported terminal commands and is automatically generated from `lib/terminal/utilities/commands_documentation.ts`.
-* Directory *[../lib](../lib)*
-   - **[../lib/application.ts](../lib/application.ts)**                                                             - The entry point to the application.
+   - **[library_list.md](library_list.md)**                                                                         - Automated list of all code and documentation files with brief descriptions.
 * Directory *[../lib/common](../lib/common)*
    - **[../lib/common/common.ts](../lib/common/common.ts)**                                                         - A collection of tools available to any environment.
    - **[../lib/common/disallowed.ts](../lib/common/disallowed.ts)**                                                 - Reassignments from default conventions that either dated or most frequently misused.
