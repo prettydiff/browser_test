@@ -4,13 +4,6 @@ import { ServerResponse } from "http";
 declare global {
 
     // test application
-    interface serverOutput {
-        agent: string;
-        agentType: agentType;
-        server: httpServer;
-        webPort: number;
-        wsPort: number;
-    }
     interface testComplete {
         callback: Function;
         fail: number;
@@ -22,7 +15,7 @@ declare global {
         fail: number;
         index: number;
         list: number[];
-        test: testItem | testService;
+        test: testItem;
         testType: "service" | "simulation";
         values: [string, string, string];
     }
@@ -38,10 +31,6 @@ declare global {
         file?: string;
         qualifier: qualifier | qualifierFile;
         test: string;
-    }
-    interface testTypeCollection {
-        service: testServiceApplication;
-        simulation: testSimulationApplication;
     }
     // ------------------------------------
 
@@ -113,7 +102,6 @@ declare global {
         index: number;
         result: [boolean, string, string][];
         test: testBrowserItem;
-        transfer: testBrowserTransfer;
     }
     interface testBrowserTest {
         node: testBrowserDOM;
@@ -132,45 +120,6 @@ declare global {
         index: number;
         lastItem: string;
         machine: string;
-    }
-    // ------------------------------------
-
-    // test services
-    interface testServiceApplication {
-        addServers?: (callback:Function) => void;
-        execute?: (config:testExecute) => void;
-        killServers?: (complete:testComplete) => void;
-        populate?:() => void;
-        serverRemote: {
-            device: {
-                [key:string]: httpServer;
-            };
-            user: {
-                [key:string]: httpServer;
-            };
-        };
-        tests?: testService[];
-    }
-    interface testServiceShares {
-        local?: agentShares;
-        remote?: agentShares;
-    }
-    interface testServiceSettings {
-        "settings": {
-            data: agents | ui_data;
-            response: ServerResponse;
-            type: settingsType;
-        };
-    }
-    interface testService {
-        artifact?: string;
-        command: heartbeat | invite | settings | systemDataCopy | systemDataFile | testServiceSettings;
-        file?: string;
-        name: string;
-        qualifier: qualifier;
-        requestType: requestType;
-        shares?: testServiceShares;
-        test: fileStatusMessage | fsDetails | heartbeat | stringData[] | string;
     }
     // ------------------------------------
 

@@ -16,7 +16,7 @@ import * as stream from "stream";
 // top scoped variables used in the terminal libraries
 const vars:terminalVariables = {
     cli: process.argv.join(" "),                  // cli                 - a list of all terminal arguments before this list is modified, only used in error reporting
-    command: "drial",                             // command             - the given command name executing in the current application instance
+    command: "test",                              // command             - the given command name executing in the current application instance
     command_instruction: "node js/application ",  // command_instruction - the command to execution this application from a terminal
     commands: {
         exampleName: {
