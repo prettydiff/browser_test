@@ -6,7 +6,7 @@ import humanTime from "./humanTime.js";
 import vars from "./vars.js";
 
 // uniform error formatting
-const error = function terminal_utilities_error(errText:string[]):void {
+const error = function terminal_utilities_error(errText:string[], exitCode?:0|1):void {
     // eslint-disable-next-line
     const logger:(input:string|object) => void = console.log,
         bell = function terminal_utilities_error_bell():void {
@@ -87,6 +87,9 @@ const error = function terminal_utilities_error(errText:string[]):void {
         debug();
     } else {
         errorOut();
+    }
+    if (exitCode !== undefined) {
+        process.exit(exitCode);
     }
 };
 

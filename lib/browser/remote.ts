@@ -7,6 +7,14 @@ declare global {
     }
 }
 
+// start chrome --remote-debugging-port=9000 --no-first-run --no-default-browser-check
+// * --disable-web-security
+// start firefox -start-debugger-server 9000
+
+// chrome - https://chromedevtools.github.io/devtools-protocol/
+// firefox - https://embracethered.com/blog/posts/2020/cookies-on-firefox/
+// firefox - https://admx.help/?Category=FrontMotion&Policy=FrontMotion.Policies.Firefox::DEVTOOLS_DEBUGGER_PROMPT_CONNECTION
+
 window.drialRemote = {
 
     /* The action this module should take in response to test instructions from the terminal */
@@ -38,7 +46,7 @@ window.drialRemote = {
                 setTimeout(browser_remote_delay_timeout, delay);
             };
         // eslint-disable-next-line
-        console.log(`Executing delay on test number ${window.drialRemote.index + 1}: ${config.name}`);
+        console.log(`Drial - Executing delay on test number ${window.drialRemote.index + 1}: ${config.name}`);
         if (config.delay === undefined) {
             window.drialRemote.report(config.unit, window.drialRemote.index);
         } else {
@@ -402,7 +410,8 @@ window.drialRemote = {
         if (typeof testString === "string" && (/^\s*\{\s*"((delay)|(interaction)|(name)|(unit))"\s*:/).test(testString) === true) {
             window.drialRemote.event(JSON.parse(testString), false);
         } else {
-            console.error(`Poorly formed testString\n${testString}`);
+            // eslint-disable-next-line
+            console.error(`Drial - Poorly formed testString\n${testString}. It does not appear to be a drial test.`);
         }
     },
 
@@ -425,33 +434,22 @@ window.drialRemote = {
     },
 
     send: function browser_remote_send(payload:[boolean, string, string][], index:number, task:testBrowserAction):void {
-        const xhr:XMLHttpRequest = new XMLHttpRequest(),
-            data:testBrowserRoute = {
-                action: task,
-                exit: null,
-                index: index,
-                result: payload,
-                test: null
-            },
-            readyState = function local_network_xhr_readyState():void {
-                if (xhr.readyState === 4) {
-                    if (xhr.status !== 200 && xhr.status !== 0) {
-                        const error:error = {
-                            error: `XHR responded with ${xhr.status} when sending messages to terminal.`,
-                            stack: [new Error().stack.replace(/\s+$/, "")]
-                        };
-                        // eslint-disable-next-line
-                        console.error(error);
-                    }
-                }
-            };
-        
-        xhr.onreadystatechange = readyState;
-        xhr.open("POST", `http://localhost:${window.drialRemote.serverPort}`, true);
-        xhr.withCredentials = true;
-        xhr.timeout = 2000;
-        xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-        xhr.send(JSON.stringify(data));
+        const report:testBrowserRoute = {
+            action: task,
+            exit: null,
+            index: index,
+            result: payload,
+            test: null
+        };
+        if (payload[payload.length][0] === false) {
+            // eslint-disable-next-line
+            console.error(`Drial - Test number ${index + 1} failed.`);
+        } else {
+            // eslint-disable-next-line
+            console.info(`Drial - Test number ${index + 1} passed.`);
+        }
+        // eslint-disable-next-line
+        console.log(`Drial - report:${JSON.stringify(report)}`);
     },
 
     /* The random port of the locally running http service*/

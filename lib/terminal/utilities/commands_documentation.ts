@@ -4,77 +4,6 @@ import vars from "./vars.js";
 
 const commands_documentation = function terminal_utility_commandsDocumentation(command:string):commandDocumentation {
     return {
-        agent_data: {
-            description: "Lists agent data.",
-            example: [
-                {
-                    code: `${command}agent_data`,
-                    defined: "Lists all agent data."
-                },
-                {
-                    code: `${command}agent_data device`,
-                    defined: "Lists all device type agent data."
-                },
-                {
-                    code: `${command}agent_data user`,
-                    defined: "Lists all user type agent data."
-                },
-                {
-                    code: `${command}agent_data "desktop computer"`,
-                    defined: "Lists any agent whose names contain the search string"
-                },
-                {
-                    code: `${command}agent_data "16f07e8ed7225f07912da48e0d51308e8fbf9dafc89d8accaa58abc1da8a2832a046082bfc2534eb4933a00bd673019cb90437c8a94cc0d0adaf9cff40c5083b"`,
-                    defined: "Outputs data for the matching hash string, if any.  The hash must be composed of 128 characters only composed of only 0-9 and lower case a-f."
-                }
-            ]
-        },
-        agent_online: {
-            description: "Allows testing connectivity to remote agents.  Think of this as an alternative to ping where specified port, address, and protocol are tested for the agents specified.",
-            example: [
-                {
-                    code: `${command}agent_online a5908e8446995926ab2dd037851146a2b3e6416dcdd68856e7350c937d6e92356030c2ee702a39a8a2c6c58dac9adc3d666c28b96ee06ddfcf6fead94f81054e`,
-                    defined: "This will test a connection to the specified agent."
-                },
-                {
-                    code: `${command}agent_online list`,
-                    defined: "Specifying the parameter 'list' will output a list of all agent hashes, names, and IP addresses by agent type."
-                },
-                {
-                    code: `${command}agent_online device`,
-                    defined: "An argument of 'device' will test connectivity on each device agent."
-                },
-                {
-                    code: `${command}agent_online user`,
-                    defined: "An argument of 'user' will test connectivity on each user agent."
-                },
-                {
-                    code: `${command}agent_online all`,
-                    defined: "An argument of 'all' will run connectivity tests on all stored agents."
-                }
-            ]
-        },
-        base64: {
-            description: "Convert a file or string into a base64 encoding.",
-            example: [
-                {
-                    code: `${command}base64 encode string:"my string to encode"`,
-                    defined: "Converts the provided string into a base64 encoding."
-                },
-                {
-                    code: `${command}base64 encode path/to/file`,
-                    defined: "Converts the provided file into a base64 encoding."
-                },
-                {
-                    code: `${command}base64 encode http://file.from.internet.com`,
-                    defined: "Reads a file from a URI and outputs a base64 encoding."
-                },
-                {
-                    code: `${command}base64 decode string:"a big base64 string"`,
-                    defined: "Decodes base64 strings into decoded output."
-                }
-            ]
-        },
         build: {
             description: "Rebuilds the application.",
             example: [
@@ -89,51 +18,6 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                 {
                     code: `${command}build local`,
                     defined: "The default behavior assumes TypeScript is installed globally. Use the 'local' argument if TypeScript is locally installed in node_modules."
-                }
-            ]
-        },
-        certificate: {
-            description: "Creates an HTTPS certificate and saves it in the local \"certificate\" directory.",
-            example: [
-                {
-                    code: `${command}certificate`,
-                    defined: "By default a certificate authority (CA) certificate is created."
-                },
-                {
-                    code: `${command}certificate /file/path/to/save`,
-                    defined: "Provide a file system path of where to save certificates. If no path is provided the default location is \"(project path)/lib/certificate\". If the file path is relative it will be relative to the current working directory."
-                },
-                {
-                    code: `${command}certificate remove /file/path/to/delete`,
-                    defined: "The default mode is to create a certificate. Providing the \"remove\" argument deletes the certificate in the given location. The location is optional and if not provided defaults to: \"(project path)/lib/certificate\"."
-                },
-                {
-                    code: `${command}certificate name:"certificate"`,
-                    defined: "The file name of the certificate and supporting files. The default value is \"share-file\" if no name is provided."
-                },
-                {
-                    code: `${command}certificate domain:"localhost"`,
-                    defined: "Specify a certificate domain by providing an argument beginning 'domain:'. This is optional in create mode and defaults to \"share-file\". This argument is required in remove mode on Windows as only certificates with a matching domain will be removed."
-                },
-                {
-                    code: `${command}certificate organization:"localhost"`,
-                    defined: "Specify a certificate org value by providing an argument beginning 'organization:'. This is optional in create mode and defaults to \"share-file\". This argument is required in remove mode on Windows as certificates with a matching org value will be removed."
-                },
-                {
-                    code: `${command}certificate ca-name:"certificate"`,
-                    defined: "The file name of the authority certificate and supporting files. The default value is \"share-file-ca\" if no name is provided. This is not used on self signed certificates"
-                },
-                {
-                    code: `${command}certificate ca-domain:"localhost-ca"`,
-                    defined: "Specify a certificate authority domain by providing an argument beginning 'domain:'. This is optional and defaults to \"share-file-ca\". This argument is ignored for self signed certificates or if mode is remove."
-                },
-                {
-                    code: `${command}certificate days:365`,
-                    defined: "Specify the number of days until the certificate expires. The value must be an integer. The default value is 16384."
-                },
-                {
-                    code: `${command}certificate self-sign`,
-                    defined: "The \"self-signed\" argument instead creates a self-signed certificate."
                 }
             ]
         },
@@ -352,79 +236,12 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
             description: "Builds the application and then runs all the test commands",
             example: [
                 {
-                    code: `${command}test`,
-                    defined: "Runs all the tests in the test suite."
-                }
-            ]
-        },
-        test_browser: {
-            description: "Launches the 'service' command as a child process, launches the default browser to execute DOM instructions as intervals of test automation, and then closes the browser upon completion.",
-            example: [
-                {
-                    code: `${command}test_browser`,
-                    defined: "Runs the browser interaction tests."
+                    code: `${command}test browser:firefox port:9000`,
+                    defined: "Runs all the tests in the test suite. A browser name is required where that name is recognized as an installed application.  A valid port number is also required."
                 },
                 {
-                    code: `${command}test_browser no_close`,
-                    defined: "Disables the 'window.close()' command at the end of test instructions so that the browser remains open for manual inspection."
-                },
-                {
-                    code: `${command}test_browser demo`,
-                    defined: "Same as the 'no_close' argument but also imposes a half second delay between actions so that a person can watch the interactions."
-                },
-                {
-                    code: `${command}test_browser mode:"self"`,
-                    defined: "The mode parameter determines what tests to execute. The value 'self', the default value, only execute tests using the local computer.",
-                },
-                {
-                    code: `${command}test_browser mode:"device"`,
-                    defined: "The value 'device' executes tests requiring additional computers that are 'device' type and not 'user' type. This mode requires 4 other computers executing in mode 'remote'."
-                },
-                {
-                    code: `${command}test_browser mode:"user"`,
-                    defined: "The value 'user' executes tests requiring additional computers that are 'device' and 'user' types. This mode requires 4 other computers executing in mode 'remote'."
-                },
-                {
-                    code: `${command}test_browser mode:"remote"`,
-                    defined: "The value 'remote' puts a computer into listening mode awaiting instructions from a computer executing 'agents' tests. Computers in this mode will not exit the service automatically."
-                },
-                {
-                    code: `${command}test_browser "C:\\Program Files\\Mozilla Firefox\\firefox.exe" no_close`,
-                    defined: "By default tests only execute against the default browser.  To test against other locally installed browsers simply provide the absolute path to the browser binary."
-                }
-            ]
-        },
-        test_service: {
-            description: "Launches the 'service' command as a child process to issue HTTP requests against it and test the results",
-            example: [
-                {
-                    code: `${command}test_service`,
-                    defined: "Runs tests service utility."
-                },
-                {
-                    code: `${command}test_service fs-copy`,
-                    defined: "Filter the tests to run by supplying a text fragment to filter against test names.  For example if there are 6 service tests whose names contain that string then only those 6 tests will be evaluated."
-                },
-                {
-                    code: `${command}test_service "Copy from Remote Device to different Remote Device"`,
-                    defined: "Using quotes the filter argument may contain spaces and other non-alpha characters."
-                }
-            ]
-        },
-        test_simulation: {
-            description: "Launches a test runner to execute the various commands of the services file.",
-            example: [
-                {
-                    code: `${command}test_simulation`,
-                    defined: "Runs tests against the commands offered by the services file."
-                },
-                {
-                    code: `${command}test_simulation help`,
-                    defined: "Filter the tests to run by supplying a text fragment to filter against test names.  For example if there are 6 service tests whose names contain that string then only those 6 tests will be evaluated."
-                },
-                {
-                    code: `${command}test_simulation "hash ~/share-file-systems list ignore ['node_modules'"`,
-                    defined: "Using quotes the filter argument may contain spaces and other non-alpha characters."
+                    code: `${command}test browser:firefox port:9000 delay:2000`,
+                    defined: "Optionally the delay can be specified with a value in milliseconds.  The default value is 10000 (10 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time."
                 }
             ]
         },

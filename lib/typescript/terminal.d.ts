@@ -3,6 +3,12 @@
 import { IncomingHttpHeaders } from "http";
 
 declare global {
+    // browserLaunch
+    interface browserLaunch {
+        [key:string]: "--no-first-run --no-default-browser-check --remote-debugging-port=" | "-start-debugger-server ";
+    }
+    // ------------------------------------
+
     // build
     interface buildPhaseList {
         commands:() => void;
