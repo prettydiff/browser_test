@@ -153,6 +153,14 @@ window.drialRemote = {
                             }
                         }, delay);
                         return;
+                    } else if (config.event === "resize" && config.node[0][0] === "window") {
+                        if (config.coords === undefined || config.coords === null || config.coords.length !== 2 || isNaN(Number(config.coords[0])) === true || isNaN(Number(config.coords[0])) === true) {
+                            window.drialRemote.send([
+                                [false, `event error ${String(element)}`, config.node.nodeString]
+                            ], item.index, item.action);
+                            return;
+                        }
+                        window.resizeTo(Number(config.coords[0]), Number(config.coords[1]));
                     } else if (config.event !== "refresh-interaction") {
                         element = window.drialRemote.node(config.node, null) as HTMLElement;
                         if (window.drialRemote.domFailure === true) {
@@ -166,9 +174,11 @@ window.drialRemote = {
                             return;
                         }
                         if (config.event === "move") {
-                            htmlElement = element as HTMLInputElement;
-                            htmlElement.style.top = `${config.coords[0]}em`;
-                            htmlElement.style.left = `${config.coords[1]}em`;
+                            element.style.top = `${config.coords[0]}em`;
+                            element.style.left = `${config.coords[1]}em`;
+                        } else if (config.event === "resize") {
+                            element.style.width = `${config.coords[0]}em`;
+                            element.style.height = `${config.coords[1]}em`;
                         } else if (config.event === "setValue") {
                             htmlElement = element as HTMLInputElement;
                             if (config.value.indexOf("replace\u0000") === 0) {
