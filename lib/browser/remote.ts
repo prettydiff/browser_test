@@ -1,6 +1,8 @@
 
 /* lib/browser/remote - A collection of instructions to allow event execution from outside the browser, like a remote control. */
 
+import dom from "./dom.js";
+
 declare global {
     interface Window {
         drialRemote: module_remote;
@@ -18,7 +20,10 @@ declare global {
 window.drialRemote = {
 
     /* The action this module should take in response to test instructions from the terminal */
-    action: "result",
+    action: (function browser_remote_action():testBrowserAction {
+        dom(); // adds custom extensions to the DOM
+        return "result";
+    }()),
 
     /* Executes the delay test unit if a given test has a delay property */
     delay: function browser_remote_delay(config:testBrowserItem):void {

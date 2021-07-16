@@ -1,5 +1,20 @@
 /* lib/typescript/browser.d - TypeScript interfaces used by browser specific libraries. */
 
+// dom
+interface Document {
+    getElementsByAttribute: (name:string, value:string) => Element[];
+    getNodesByType: (typeValue:number | string) => Node[];
+    getElementsByText: (textValue:string, caseSensitive?:boolean) => Element[];
+}
+interface Element {
+    getAncestor: (identifier:string, selector:selector) => Element;
+    getElementsByAttribute: (name:string, value:string) => Element[];
+    getNodesByType: (typeValue:number | string) => Node[];
+    getElementsByText: (textValue:string, caseSensitive?:boolean) => Element[];
+}
+// ------------------------------------
+
+// remote
 interface module_remote {
     action: testBrowserAction;
     delay: (config:testBrowserItem) => void;
@@ -19,3 +34,4 @@ interface module_remote {
     serverPort: number;
     stringify: (primitive:primitive) => string;
 }
+// ------------------------------------
