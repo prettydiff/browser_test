@@ -4,8 +4,8 @@ import { IncomingHttpHeaders } from "http";
 
 declare global {
     // browserLaunch
-    interface browserLaunch {
-        [key:string]: "--no-first-run --no-default-browser-check --remote-debugging-port=" | "-start-debugger-server ";
+    interface browserLaunchList {
+        [key:string]: string;
     }
     // ------------------------------------
 

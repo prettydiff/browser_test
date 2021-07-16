@@ -236,12 +236,16 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
             description: "Builds the application and then runs all the test commands",
             example: [
                 {
-                    code: `${command}test browser:firefox port:9000`,
+                    code: `${command}test browser:firefox`,
                     defined: "Runs all the tests in the test suite. A browser name is required where that name is recognized as an installed application.  A valid port number is also required."
                 },
                 {
-                    code: `${command}test browser:firefox port:9000 delay:2000`,
-                    defined: "Optionally the delay can be specified with a value in milliseconds.  The default value is 10000 (10 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time."
+                    code: `${command}test browser:firefox port:9000`,
+                    defined: "Optionally the port can be specified.  The default value is 0 which means any available TCP port."
+                },
+                {
+                    code: `${command}test browser:firefox delay:2000`,
+                    defined: "Optionally the delay can be specified with a value in milliseconds.  The default value is 5000 (5 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time."
                 }
             ]
         },

@@ -16,20 +16,44 @@ import WebSocket from "../../ws-es6/index.js";
 
 // run the test suite using the build application
 const test = function terminal_commands_test():void {
+    let port:number = (function terminal_commands_test_port():number {
+        let a:number = process.argv.length,
+            value:string = "",
+            numb:number = 0;
+        if (a > 0) {
+            do {
+                a = a - 1;
+                if (process.argv[a].indexOf("port:") === 0) {
+                    value = process.argv[a].split(":")[1];
+                    numb = Number(value);
+                    if (isNaN(numb) === true) {
+                        return 0;
+                    }
+                    if (numb < 1) {
+                        return 0;
+                    }
+                    return numb;
+                }
+            } while (a > 0);
+        }
+        return 0;
+    }());
     const delay:number = (function browser_commands_test_delay():number {
             let a:number = process.argv.length,
                 value:string = "";
-            do {
-                a = a - 1;
-                if (process.argv[a].indexOf("delay:") === 0) {
-                    value = process.argv[a].slice(6);
-                    if (isNaN(Number(value)) === true) {
-                        error([`${vars.text.angry}Delay value ${value} is not a number.${vars.text.none}`], 1);
+            if (a > 0) {
+                do {
+                    a = a - 1;
+                    if (process.argv[a].indexOf("delay:") === 0) {
+                        value = process.argv[a].slice(6);
+                        if (isNaN(Number(value)) === true) {
+                            error([`${vars.text.angry}Delay value ${value} is not a number.${vars.text.none}`], 1);
+                        }
+                        return Number(value);
                     }
-                    return Number(value);
-                }
-            } while (a > 0);
-            return 10000;
+                } while (a > 0);
+            }
+            return 5000;
         }()),
         server:Server = vars.node.http.createServer(function terminal_commands_test_server(request:IncomingMessage, serverResponse:ServerResponse):void {
             let body:string = "",
@@ -86,52 +110,57 @@ const test = function terminal_commands_test():void {
             : (process.platform === "win32")
                 ? "start"
                 : "xdg-open",
-        port:number = (function terminal_commands_test_port():number {
-            let a:number = process.argv.length,
-                value:string = "",
-                numb:number = 0;
-            if (a > 0) {
-                do {
-                    a = a - 1;
-                    if (process.argv[a].indexOf("port:") === 0) {
-                        value = process.argv[a].split(":")[1];
-                        numb = Number(value);
-                        if (isNaN(numb) === true) {
-                            error([`${vars.text.angry}Specified port is not a number.${vars.text.none}`], 1);
-                        }
-                        if (numb < 1) {
-                            error([`${vars.text.angry}Specified port is not a number greater than 0.${vars.text.none}`], 1);
-                        }
-                        return numb;
-                    }
-                } while (a > 0);
-            }
-            error([
-                `${vars.text.angry}No port specified.${vars.text.none}`,
-                `Please see this example: ${vars.text.cyan}drial test browser:firefox port:61352${vars.text.none}`,
-                "Port numbers are integers in the range of 1-65535. The higher the port number the more likely it is unused."
-            ], 1);
-        }()),
         launch = function terminal_commands_test_browserLaunch():void {
             // this delay is necessary to launch the browser and allow it open before sending it commands
             const delayStart = function terminal_commands_test_browserLaunch_delayStart(err:Error, stdout:string, stderr:string):void {
+                console.log("stdout "+stdout.length+" "+stdout);
+                console.log("stderr "+stderr.length+" "+stderr);
                 if (err === null) {
-                    setTimeout(function terminal_commands_test_browserLaunch_delayStart_timeout():void {
-                        server.listen({
-                            port: 0
-                        }, listener);
-                    }, delay);
+                    const filePath:string = (browserLaunch[name].indexOf("user-data-dir=") > 0)
+                            ? `${logPathChrome + vars.sep}DevToolsActivePort`
+                            : logPathFirefox,
+                        timeout = function terminal_commands_test_browserLaunch_delayStart_timeout():void {
+                            if (port === 0) {
+                                // at this time I don't how to read the service port from Firefox
+                                if (browserLaunch[name].indexOf("-MOZ_LOG") > -1) {
+                                    error([
+                                        `${vars.text.angry}An explicit port value must be provided for Firefox based browsers.${vars.text.none}`,
+                                        `Example: ${vars.text.cyan}drial test browser:firefox port:9000${vars.text.none}`
+                                    ], 1);
+                                } else {
+                                    vars.node.fs.readFile(filePath, function terminal_commands_test_browserLaunch_delayStart_chromePort(fileError:Error, fileData:Buffer):void {
+                                        if (fileError === null) {
+                                            port = Number(fileData.toString().split("\n")[0]);
+                                            server.listen({
+                                                port: 0
+                                            }, listener);
+                                        } else {
+                                            error([fileError.toString()], 1);
+                                        }
+                                    });
+                                }
+                            } else {
+                                server.listen({
+                                    port: 0
+                                }, listener);
+                            }
+                        };
+                    setTimeout(timeout, delay);
                 } else {
                     error([err.toString()], 1);
                 }
             };
             let a:number = process.argv.length,
-                name:string = "";
+                name:string = "",
+                logPathChrome:string = "",
+                logPathFirefox:string = "";
             if (a > 0) {
                 do {
                     a = a - 1;
                     if (process.argv[a].indexOf("browser:") === 0) {
-                        name = process.argv[a].split("browser:")[1].toLowerCase();
+                        // cspell:disable
+                        name = process.argv[a].split("browser:")[1].toLowerCase().replace(/^edge$/, "msedge");
+                        // cspell:enable
                         break;
                     }
                 } while (a > 0);
@@ -147,9 +176,15 @@ const test = function terminal_commands_test():void {
                 ], 1);
             }
             if (name === "") {
-                // find default browser
+                error([
+                    `${vars.text.angry}No browser specified.${vars.text.none}`,
+                    `Example: ${vars.text.cyan}drial test browser:chrome${vars.text.none}`
+                ], 1);
             } else {
-                vars.node.child(`${keyword} ${name} ${browserLaunch[name] + port}`, delayStart);
+                // open a browser in the OS with its appropriate flags and port number
+                logPathChrome = `${vars.projectPath}lib${vars.sep}logs${vars.sep}chrome`;
+                logPathFirefox = `"${vars.projectPath}lib${vars.sep}logs${vars.sep}firefox${vars.sep}log" `;
+                vars.node.child(`${keyword} ${name} ${browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${logPathChrome}"`).replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE ${logPathFirefox}`) + port}`, delayStart);
             }
         },
         listener = function terminal_commands_test_listener():void {

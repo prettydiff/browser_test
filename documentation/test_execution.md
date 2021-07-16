@@ -1,6 +1,6 @@
-<!-- documentation/remote - How this application achieves test automation. -->
+<!-- documentation/test_execution - How this application achieves test automation. -->
 
-# drial - Browser Test Automation
+# drial - Test Execution in the Browser
 Execute test automation in the browser using just JavaScript and without dependencies.
 
 [Video demo](https://prettydiff.com/share-test-automation.mp4)

@@ -19,7 +19,7 @@ The following documentation uses the `start` command to launch the application. 
 The actual documentation per browser.
 
 ### Chrome
-* **Execution** - `start chrome --remote-debugging-port=9000 --no-first-run --no-default-browser-check`
+* **Execution** - `start chrome --enable-logging=stderr --v=1 --no-first-run --no-default-browser-check --remote-debugging-port=9000`
    - Optionally the following flag can also be used to disable same origin policy: `--disable-web-security`
 * **Documentation**
    - Command line options - https://peter.sh/experiments/chromium-command-line-switches/
@@ -30,7 +30,9 @@ The actual documentation per browser.
 * **Execution** - `start firefox -start-debugger-server 9000`
 * **Documentation**
    - Command line options - https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options?redirectlocale=en-US&redirectslug=Command_Line_Options
-   - Developer Tools Protocol - https://firefox-source-docs.mozilla.org/remote/index.html
+   - More Command line options - https://www-archive.mozilla.org/quality/browser/front-end/testcases/cmd-line/
+   - Developer Tools Protocol - https://firefox-source-docs.mozilla.org/remote/index.html (additional to Chrome's Developer Tools Protocol, CDP)
+   - Logging modules - https://searchfox.org/mozilla-central/search?q=LazyLogModule.*%22&path=&case=false&regexp=true
 * **Configuration**
    - In the browser go to page `about:config` and change these by searching for them and double clicking them:
       * `browser.shell.checkDefaultBrowser` - value **false**
@@ -46,7 +48,9 @@ Safari is a bit of a mystery due to limited documentation from Apple and a stron
 **Safari is not supported without additional guidance and documentation**
 
 ### Edge
-See the *Chrome* section above.
+<!--cspell:disable-->
+See the *Chrome* section above. Edge browser is identified by the operating system as **msedge**.
+<!--cspell:enable-->
 
 ### Opera
 See the *Chrome* section above.
