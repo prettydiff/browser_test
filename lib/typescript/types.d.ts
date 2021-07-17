@@ -1,5 +1,6 @@
 /* lib/typescript/types.d - TypeScript static types. */
 
+type browser = "brave" | "chrome" | "edge" | "firefox" | "msedge" | "opera" | "vivaldi";
 type browserDOM = [domMethod, string, number];
 type buildPhase = "commands" | "configurations" | "libReadme" | "lint" | "typescript" | "version";
 type commands = "build" | "commands" | "directory" | "get" | "lint" | "mkdir" | "remove" | "test" | "update" | "version";

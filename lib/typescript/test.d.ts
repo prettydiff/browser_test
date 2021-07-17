@@ -2,6 +2,17 @@
 
 import { ServerResponse } from "http";
 declare global {
+    // campaigns
+    interface campaign {
+        startPage: string;
+        browser: browser;
+        port: number;
+        tests: testBrowserItem[];
+    }
+    interface campaignModule {
+        default: campaign;
+    }
+    // ------------------------------------
 
     // test application
     interface testComplete {
@@ -83,7 +94,6 @@ declare global {
     interface testBrowserItem {
         delay?: testBrowserTest;
         interaction: testBrowserEvent[];
-        machine: string;
         name: string;
         unit: testBrowserTest[];
     }

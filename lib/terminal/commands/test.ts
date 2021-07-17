@@ -16,42 +16,21 @@ import WebSocket from "../../ws-es6/index.js";
 
 // run the test suite using the build application
 const test = function terminal_commands_test():void {
-    let port:number = (function terminal_commands_test_port():number {
-        let a:number = process.argv.length,
-            value:string = "",
-            numb:number = 0;
-        if (a > 0) {
+    const argv = function browser_commands_test_argv(name:string):string|null {
+            let a:number = process.argv.length;
             do {
                 a = a - 1;
-                if (process.argv[a].indexOf("port:") === 0) {
-                    value = process.argv[a].split(":")[1];
-                    numb = Number(value);
-                    if (isNaN(numb) === true) {
-                        return 0;
-                    }
-                    if (numb < 1) {
-                        return 0;
-                    }
-                    return numb;
+                if (process.argv[a].indexOf(`${name}:`) === 0 && process.argv[a] !== `${name}:`) {
+                    return process.argv[a].slice(name.length + 1);
                 }
             } while (a > 0);
-        }
-        return 0;
-    }());
-    const delay:number = (function browser_commands_test_delay():number {
-            let a:number = process.argv.length,
-                value:string = "";
-            if (a > 0) {
-                do {
-                    a = a - 1;
-                    if (process.argv[a].indexOf("delay:") === 0) {
-                        value = process.argv[a].slice(6);
-                        if (isNaN(Number(value)) === true) {
-                            error([`${vars.text.angry}Delay value ${value} is not a number.${vars.text.none}`], 1);
-                        }
-                        return Number(value);
-                    }
-                } while (a > 0);
+            return null;
+        },
+        delay:number = (function browser_commands_test_delay():number {
+            const value:string = argv("delay"),
+                numb:number = Number(value);
+            if (value !== null && numb > 0) {
+                return numb;
             }
             return 5000;
         }()),
@@ -73,8 +52,6 @@ const test = function terminal_commands_test():void {
                     const message:string = `Response from terminal. Request body size: ${body.length}`,
                         readStream:Readable = vars.node.stream.Readable.from(message);
                     ended = true;
-                    
-                    console.log(body.length+" "+body);
 
                     serverResponse.setHeader("cache-control", "no-store");
                     serverResponse.setHeader("alt-svc", "clear");
@@ -105,16 +82,14 @@ const test = function terminal_commands_test():void {
             request.on("end", requestEnd);
             request.on("error", requestError);
         }),
-        keyword:"start"|"open"|"xdg-open" = (process.platform === "darwin")
+        keyword:"open"|"start"|"xdg-open" = (process.platform === "darwin")
             ? "open"
             : (process.platform === "win32")
                 ? "start"
                 : "xdg-open",
-        launch = function terminal_commands_test_browserLaunch():void {
+        launch = function terminal_commands_test_browserLaunch(campaign:campaign):void {
             // this delay is necessary to launch the browser and allow it open before sending it commands
-            const delayStart = function terminal_commands_test_browserLaunch_delayStart(err:Error, stdout:string, stderr:string):void {
-                console.log("stdout "+stdout.length+" "+stdout);
-                console.log("stderr "+stderr.length+" "+stderr);
+            const delayStart = function terminal_commands_test_browserLaunch_delayStart(err:Error):void {
                 if (err === null) {
                     const filePath:string = (browserLaunch[name].indexOf("user-data-dir=") > 0)
                             ? `${logPathChrome + vars.sep}DevToolsActivePort`
@@ -150,22 +125,13 @@ const test = function terminal_commands_test():void {
                     error([err.toString()], 1);
                 }
             };
-            let a:number = process.argv.length,
-                name:string = "",
+            let name:string = argv("browser"),
                 logPathChrome:string = "",
                 logPathFirefox:string = "";
-            if (a > 0) {
-                do {
-                    a = a - 1;
-                    if (process.argv[a].indexOf("browser:") === 0) {
-                        // cspell:disable
-                        name = process.argv[a].split("browser:")[1].toLowerCase().replace(/^edge$/, "msedge");
-                        // cspell:enable
-                        break;
-                    }
-                } while (a > 0);
-            }
-            if (name !== "" && browserLaunch[name] === undefined) {
+            name = (name === null)
+                ? name = campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
+                : name.toLowerCase().replace(/^edge$/, "msedge");
+            if (browserLaunch[name] === undefined) {
                 error([
                     `${vars.text.angry}Specified browser ${name} is not supported.${vars.text.none}`,
                     "",
@@ -175,17 +141,10 @@ const test = function terminal_commands_test():void {
                     `${vars.text.angry}*${vars.text.none} Submit a pull request to https://github.com/prettydiff/drial`,
                 ], 1);
             }
-            if (name === "") {
-                error([
-                    `${vars.text.angry}No browser specified.${vars.text.none}`,
-                    `Example: ${vars.text.cyan}drial test browser:chrome${vars.text.none}`
-                ], 1);
-            } else {
-                // open a browser in the OS with its appropriate flags and port number
-                logPathChrome = `${vars.projectPath}lib${vars.sep}logs${vars.sep}chrome`;
-                logPathFirefox = `"${vars.projectPath}lib${vars.sep}logs${vars.sep}firefox${vars.sep}log" `;
-                vars.node.child(`${keyword} ${name} ${browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${logPathChrome}"`).replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE ${logPathFirefox}`) + port}`, delayStart);
-            }
+            // open a browser in the OS with its appropriate flags and port number
+            logPathChrome = `${vars.projectPath}lib${vars.sep}logs${vars.sep}chrome`;
+            logPathFirefox = `"${vars.projectPath}lib${vars.sep}logs${vars.sep}firefox${vars.sep}log" `;
+            vars.node.child(`${keyword} ${name} ${browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${logPathChrome}"`).replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE ${logPathFirefox}`) + port}`, delayStart);
         },
         listener = function terminal_commands_test_listener():void {
             const serverAddress:AddressInfo = server.address() as AddressInfo,
@@ -206,13 +165,13 @@ const test = function terminal_commands_test():void {
                     });
                     response.on("end", function terminal_commands_test_listener_session_end():void {
                         let id:number = 0,
-                            remote:string = "",
-                            priorMessage: string = "";
+                            remote:string = "";
                         const body:Buffer|string = (Buffer.isBuffer(chunks[0]) === true)
                                 ? Buffer.concat(chunks)
                                 : chunks.join(""),
                             list = JSON.parse(body.toString()),
                             ws = new WebSocket(list[0].webSocketDebuggerUrl, {perMessageDeflate: false}),
+                            // eslint-disable-next-line
                             send = function terminal_commands_test_listener_session_send(method:string, params?:any):void {
                                 id = id + 1;
                                 ws.send(JSON.stringify({
@@ -237,19 +196,17 @@ const test = function terminal_commands_test():void {
                                     send("DOM.enable");
                                     sendRemote();
                                     send("Page.navigate", {
-                                        url: "https://prettydiff.com/"
+                                        url: startPage
                                     });
                                 } else {
                                     error([readError.toString()]);
                                 }
                             });
                         });
-                        ws.on('message', function terminal_command_test_listener_wsMessage(data:string):void {
+                        ws.on("message", function terminal_command_test_listener_wsMessage(data:string):void {
                             if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0) {
                                 sendRemote();
-                                //send("");
                             }
-                            priorMessage = data;
                             console.log(data.slice(0, 250));
                         });
                     });
@@ -257,15 +214,43 @@ const test = function terminal_commands_test():void {
                         error([errorText.toString()]);
                     });
                 });
-    
-            console.log(`Server port: ${serverAddress.port}`);
             clientRequest.on("error", function terminal_commands_test_listener_requestError(errorText:Error):void {
                 error([errorText.toString()]);
             });
             clientRequest.write("");
             clientRequest.end();
-        };
-    launch();
+        },
+        campaignName:string = argv("campaign");
+
+    // evaluate the optional port argument
+    let port:number = (function terminal_commands_test_port():number {
+            const value:string = argv("port"),
+                numb:number = Number(value);
+            if (value === null || numb < 1) {
+                return 0;
+            }
+            return numb;
+        }()),
+        startPage:string = "";
+    if (campaignName === null) {
+        error([
+            `${vars.text.angry}A campaign name is required, but it is missing.${vars.text.none}`,
+            `Example: ${vars.text.cyan}drial test campaign:demo${vars.text.none}`
+        ], 1);
+    }
+    vars.node.fs.stat(`${vars.js}campaigns${vars.sep + campaignName}.js`, function terminal_commands_test_campaign(err:Error):void {
+        if (err === null) {
+            // @ts-ignore - this is working correct because es2020 is set in the tsconfig, but the ide doesn't see it
+            import(`file:///${vars.js.replace(/\\/g, "/")}campaigns/${campaignName}.js`).then(function terminal_commands_test_campaign_promise(campaign:campaignModule) {
+                startPage = campaign.default.startPage;
+                launch(campaign.default);
+            });
+        } else {
+            error([
+                `${vars.text.angry}There is not a campaign file of name ${campaignName} in the campaigns directory.${vars.text.none}`
+            ], 1);
+        }
+    });
 };
 
 export default test;

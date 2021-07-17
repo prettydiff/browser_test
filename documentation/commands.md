@@ -148,11 +148,11 @@ Launches a HTTP service and web sockets so that the web tool is automatically re
 Builds the application and then runs all the test commands
 
 ### Examples
-1. `drial test browser:firefox`
-   - Runs all the tests in the test suite. A browser name is required where that name is recognized as an installed application.  A valid port number is also required.
+1. `drial test campaign:demo`
+   - Executes tests in the provided campaign name.  The campaign value matches the name of a file in the campaigns directory without file extension.
 1. `drial test browser:firefox port:9000`
-   - Optionally the port can be specified.  The default value is 0 which means any available TCP port.
-1. `drial test browser:firefox delay:2000`
+   - Optionally the port and/or browser can be specified. The browser and port are indicated in the test campaign, but these values will override the values indicated in the campaign file.
+1. `drial test delay:2000`
    - Optionally the delay can be specified with a value in milliseconds.  The default value is 5000 (5 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time.
 
 ## update

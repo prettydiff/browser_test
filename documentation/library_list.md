@@ -11,6 +11,7 @@ This is a dynamically compiled list of supporting code files that comprise this 
 * Directory *[../lib](../lib)*
    - **[../lib/machines.ts](../lib/machines.ts)**                                                                   - A storage of machines for connectivity in peer-to-peer testing.
 * Directory *[../lib/browser](../lib/browser)*
+   - **[../lib/browser/dom.ts](../lib/browser/dom.ts)**                                                             - Extensions to the DOM to provide navigational functionality not present from the standard methods
    - **[../lib/browser/remote.ts](../lib/browser/remote.ts)**                                                       - A collection of instructions to allow event execution from outside the browser, like a remote control.
 * Directory *[../lib/common](../lib/common)*
    - **[../lib/common/common.ts](../lib/common/common.ts)**                                                         - A collection of tools available to any environment.

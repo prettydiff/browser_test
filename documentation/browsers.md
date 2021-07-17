@@ -48,9 +48,7 @@ Safari is a bit of a mystery due to limited documentation from Apple and a stron
 **Safari is not supported without additional guidance and documentation**
 
 ### Edge
-<!--cspell:disable-->
-See the *Chrome* section above. Edge browser is identified by the operating system as **msedge**.
-<!--cspell:enable-->
+See the *Chrome* section above. Edge browser is identified by the operating system as **msedge**, but the browser name *edge* is accepted by this application.
 
 ### Opera
 See the *Chrome* section above.
