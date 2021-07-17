@@ -196,7 +196,7 @@ const test = function terminal_commands_test():void {
                                     send("DOM.enable");
                                     sendRemote();
                                     send("Page.navigate", {
-                                        url: startPage
+                                        url: campaign.startPage
                                     });
                                 } else {
                                     error([readError.toString()]);
@@ -204,10 +204,32 @@ const test = function terminal_commands_test():void {
                             });
                         });
                         ws.on("message", function terminal_command_test_listener_wsMessage(data:string):void {
-                            if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0) {
+                            if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0 && data.indexOf(loaderId) > 0) {
+                                // inject code into next requested page
                                 sendRemote();
+                            } else if (data.indexOf("{\"method\":\"Page.frameStoppedLoading\"") === 0 && data.indexOf(frameId) > 0) {
+                                // send a test
+                                const route:testBrowserRoute = {
+                                    action: "result",
+                                    exit: null,
+                                    index: testIndex,
+                                    result: null,
+                                    test: campaign.tests[testIndex]
+                                };
+                                send("Runtime.evaluate", {
+                                    expression: `window.drialRemote.parse('${JSON.stringify(route)}')`
+                                });
+                            } else if (data.indexOf("{\"method\":\"Runtime.consoleAPICalled\"") === 0 && data.indexOf("Drial - report") > 0) {
+                                // reading a test result from the browser
+                                const result:testBrowserRoute = JSON.parse(JSON.parse(data).params.args[0].value.replace("Drial - report:", ""));
+                                console.log(result);
+                            } else if (loaderId === "" && data.indexOf("{\"method\":\"Network.requestWillBeSent\"") === 0 && data.indexOf(campaign.startPage) > 0) {
+                                // grab the session identifiers when the test starts
+                                const payload:any = JSON.parse(data);
+                                frameId = payload.params.frameId;
+                                loaderId = payload.params.loaderId;
                             }
-                            console.log(data.slice(0, 250));
+                            //if (data.indexOf("{\"method\":\"Network.") !== 0){console.log(data.slice(0, 250));}
                         });
                     });
                     response.on("error", function terminal_commands_test_listener_responseError(errorText:Error):void {
@@ -231,19 +253,26 @@ const test = function terminal_commands_test():void {
             }
             return numb;
         }()),
-        startPage:string = "";
+        testIndex:number = 0,
+        frameId:string = "",
+        loaderId:string = "",
+        campaign:campaign = null;
+
+    // evaluate if a campaign is specified
     if (campaignName === null) {
         error([
             `${vars.text.angry}A campaign name is required, but it is missing.${vars.text.none}`,
             `Example: ${vars.text.cyan}drial test campaign:demo${vars.text.none}`
         ], 1);
     }
+
+    // get the test campaign file
     vars.node.fs.stat(`${vars.js}campaigns${vars.sep + campaignName}.js`, function terminal_commands_test_campaign(err:Error):void {
         if (err === null) {
             // @ts-ignore - this is working correct because es2020 is set in the tsconfig, but the ide doesn't see it
-            import(`file:///${vars.js.replace(/\\/g, "/")}campaigns/${campaignName}.js`).then(function terminal_commands_test_campaign_promise(campaign:campaignModule) {
-                startPage = campaign.default.startPage;
-                launch(campaign.default);
+            import(`file:///${vars.js.replace(/\\/g, "/")}campaigns/${campaignName}.js`).then(function terminal_commands_test_campaign_promise(campaignData:campaignModule) {
+                campaign = campaignData.default;
+                launch(campaign);
             });
         } else {
             error([
