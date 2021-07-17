@@ -240,12 +240,16 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                     defined: "Executes tests in the provided campaign name.  The campaign value matches the name of a file in the campaigns directory without file extension."
                 },
                 {
-                    code: `${command}test browser:firefox port:9000`,
+                    code: `${command}test campaign:demo browser:firefox port:9000`,
                     defined: "Optionally the port and/or browser can be specified. The browser and port are indicated in the test campaign, but these values will override the values indicated in the campaign file."
                 },
                 {
-                    code: `${command}test delay:2000`,
+                    code: `${command}test campaign:demo delay:2000`,
                     defined: "Optionally the delay can be specified with a value in milliseconds.  The default value is 5000 (5 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time."
+                },
+                {
+                    code: `${command}test campaign:demo noClose`,
+                    defined: "The default behavior is to terminate the application and close the browser upon test completion. The optional 'noClose' argument keeps everything open and alive for debugging and experimentation purposes."
                 }
             ]
         },

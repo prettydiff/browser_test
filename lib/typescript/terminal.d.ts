@@ -3,11 +3,6 @@
 import { IncomingHttpHeaders } from "http";
 
 declare global {
-    // browserLaunch
-    interface browserLaunchList {
-        [key:string]: string;
-    }
-    // ------------------------------------
 
     // build
     interface buildPhaseList {
@@ -57,6 +52,15 @@ declare global {
         obj: commandDocumentation;
         property: "description" | "each" | "example";
         total: boolean;
+    }
+    // ------------------------------------
+
+    // configuration
+    interface configuration {
+        campaignLocation: string;
+        browserLaunch: {
+            [key:string]: string;
+        }
     }
     // ------------------------------------
 

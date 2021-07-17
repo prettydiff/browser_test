@@ -12,10 +12,20 @@ const demo:campaign = {
         // a test with no interactions
         // this test just verifies artifacts on the start page
         {
+            delay: {
+                node: [
+                    ["getElementById", "investYourWayHlCta", null],
+                    ["getElementsByClassName", "heading", 0]
+                ],
+                qualifier: "is",
+                target: ["innerHTML"],
+                type: "property",
+                value: "Invest your way"
+            },
             interaction: null,
             name: "Verify artifacts on Bank of America home page",
             unit: [
-                {
+                    {
                     node: [
                         ["getElementById", "globalInputsValidationForm", null],
                         ["getElementsByTagName", "button", 0]
@@ -24,16 +34,6 @@ const demo:campaign = {
                     target: ["id"],
                     type: "attribute",
                     value: "signIn"
-                },
-                {
-                    node: [
-                        ["getElementById", "investYourWayHlCta", null],
-                        ["getElementsByClassName", "heading", 0]
-                    ],
-                    qualifier: "is",
-                    target: ["innerHTML"],
-                    type: "property",
-                    value: "Invest your way"
                 }
             ]
         },

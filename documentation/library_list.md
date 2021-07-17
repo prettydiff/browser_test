@@ -26,11 +26,19 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[../lib/terminal/commands/test.ts](../lib/terminal/commands/test.ts)**                                       - A command driven wrapper for all test utilities.
    - **[../lib/terminal/commands/update.ts](../lib/terminal/commands/update.ts)**                                   - A command to update the application from git and then run the build.
    - **[../lib/terminal/commands/version.ts](../lib/terminal/commands/version.ts)**                                 - A command utility for expressing the application's version.
+* Directory *[../lib/terminal/test](../lib/terminal/test)*
+   - **[../lib/terminal/test/iterate.ts](../lib/terminal/test/iterate.ts)**                                         - Push the next test item.
+   - **[../lib/terminal/test/listener.ts](../lib/terminal/test/listener.ts)**                                       - A service listener that processes input and output to the web browser.
+   - **[../lib/terminal/test/message.ts](../lib/terminal/test/message.ts)**                                         - Message input/output to the browser via Chrome Developer Tools Protocol (CDP).
+   - **[../lib/terminal/test/openBrowser.ts](../lib/terminal/test/openBrowser.ts)**                                 - Launches the web browser with all necessary configurations in place.
+   - **[../lib/terminal/test/results.ts](../lib/terminal/test/results.ts)**                                         - Processes test result data into output for humans to read.
+   - **[../lib/terminal/test/server.ts](../lib/terminal/test/server.ts)**                                           - A simple HTTP server to keep the application open listening for browser output.
+   - **[../lib/terminal/test/websites.ts](../lib/terminal/test/websites.ts)**                                       - The code that allows testing of websites.
 * Directory *[../lib/terminal/utilities](../lib/terminal/utilities)*
-   - **[../lib/terminal/utilities/browser_launch.ts](../lib/terminal/utilities/browser_launch.ts)**                 - Stores terminal arguments necessary to launch a browser with remote debugging enabled.
    - **[../lib/terminal/utilities/commandList.ts](../lib/terminal/utilities/commandList.ts)**                       - Groups all supported command functions into an object for single point of reference.
    - **[../lib/terminal/utilities/commandName.ts](../lib/terminal/utilities/commandName.ts)**                       - A library for visually presenting command documentation to the terminal.
    - **[../lib/terminal/utilities/commands_documentation.ts](../lib/terminal/utilities/commands_documentation.ts)** - A data structure defining command documentation with usage examples.
+   - **[../lib/terminal/utilities/configuration.ts](../lib/terminal/utilities/configuration.ts)**                   - Stores configuration values.
    - **[../lib/terminal/utilities/error.ts](../lib/terminal/utilities/error.ts)**                                   - A utility for processing and logging errors from the terminal application.
    - **[../lib/terminal/utilities/file_path_decode.ts](../lib/terminal/utilities/file_path_decode.ts)**             - Transforms a custom encoded file path into a local operation system specific file path.
    - **[../lib/terminal/utilities/file_path_encode.ts](../lib/terminal/utilities/file_path_encode.ts)**             - Creates an encoding around file system addresses so that the test code can ensure the paths are properly formed per operating system.

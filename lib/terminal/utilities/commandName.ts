@@ -1,5 +1,6 @@
 
 /* lib/terminal/utilities/commandName - A library for visually presenting command documentation to the terminal. */
+import configuration from "./configuration.js";
 import vars from "./vars.js";
 
 // determines if the terminal command is a supported feature

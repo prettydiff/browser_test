@@ -4,10 +4,10 @@ The various utility libraries for the terminal instance of the application.
 ## Files
 <!-- Do not edit below this line.  Contents dynamically populated. -->
 
-* **[browser_launch.ts](browser_launch.ts)**                 - Stores terminal arguments necessary to launch a browser with remote debugging enabled.
 * **[commandList.ts](commandList.ts)**                       - Groups all supported command functions into an object for single point of reference.
 * **[commandName.ts](commandName.ts)**                       - A library for visually presenting command documentation to the terminal.
 * **[commands_documentation.ts](commands_documentation.ts)** - A data structure defining command documentation with usage examples.
+* **[configuration.ts](configuration.ts)**                   - Stores configuration values.
 * **[error.ts](error.ts)**                                   - A utility for processing and logging errors from the terminal application.
 * **[file_path_decode.ts](file_path_decode.ts)**             - Transforms a custom encoded file path into a local operation system specific file path.
 * **[file_path_encode.ts](file_path_encode.ts)**             - Creates an encoding around file system addresses so that the test code can ensure the paths are properly formed per operating system.

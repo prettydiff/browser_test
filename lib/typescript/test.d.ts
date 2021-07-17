@@ -1,6 +1,8 @@
 /* lib/typescript/test.d - TypeScript interfaces used test automation. */
 
 import { ServerResponse } from "http";
+import { AddressInfo } from "net";
+
 declare global {
     // campaigns
     interface campaign {
@@ -11,6 +13,15 @@ declare global {
     }
     interface campaignModule {
         default: campaign;
+    }
+    // ------------------------------------
+
+    // message
+    interface browserMessageConfig {
+        campaign: campaign;
+        options: websitesInput;
+        responseBody: string;
+        serverAddress: AddressInfo;
     }
     // ------------------------------------
 
@@ -46,42 +57,6 @@ declare global {
     // ------------------------------------
 
     // test in browser
-    interface testBrowserApplication {
-        agent: string;
-        args: testBrowserArgs;
-        exitMessage: string;
-        exitType: 0 | 1;
-        index: number;
-        ip: string;
-        methods: {
-            close: (data:testBrowserRoute) => void;
-            delay: (config:testBrowserDelay) => void;
-            execute: (args:testBrowserArgs) => void;
-            exit: (index:number) => void;
-            iterate: (index:number) => void;
-            request: (item:testBrowserRoute) => void;
-            ["reset-browser"]: (data:testBrowserRoute) => void;
-            ["reset-complete"]: () => void;
-            ["reset-request"]: (data:testBrowserRoute) => void;
-            respond: (item:testBrowserRoute) => void;
-            result: (item:testBrowserRoute) => void;
-            route: (data:testBrowserRoute, serverResponse:ServerResponse) => void;
-        };
-        port: number;
-        remoteAgents: number;
-    }
-    interface testBrowserArgs {
-        callback: (message:string, failCount:number) => void;
-        demo: boolean;
-        mode: testBrowserMode;
-        noClose: boolean;
-    }
-    interface testBrowserDelay {
-        action: () => void;
-        browser: boolean;
-        delay: number;
-        message: string;
-    }
     interface testBrowserDOM extends Array<browserDOM> {
         nodeString?: string;
     }
@@ -97,15 +72,6 @@ declare global {
         name: string;
         unit: testBrowserTest[];
     }
-    interface testBrowserMachines {
-        [key:string]: {
-            [key:string]: {
-                ip: string;
-                port: number;
-                secure: boolean;
-            };
-        };
-    }
     interface testBrowserRoute {
         action: testBrowserAction;
         exit: string;
@@ -120,23 +86,22 @@ declare global {
         type: "attribute" | "element" | "property";
         value: boolean | number | string | null;
     }
-    interface testBrowserTransfer {
-        agent: string;
-        ip: string;
-        port: number;
-    }
-    interface testModalAddress {
-        address: string;
-        index: number;
-        lastItem: string;
-        machine: string;
-    }
     // ------------------------------------
 
     // test terminal command simulations
     interface testSimulationApplication {
         execute?: (config:testExecute) => void;
         tests: testItem[];
+    }
+    // ------------------------------------
+
+    // websites
+    interface websitesInput {
+        browser: string;
+        campaignName: string;
+        delay:number;
+        noClose: boolean;
+        port: number;
     }
     // ------------------------------------
 }
