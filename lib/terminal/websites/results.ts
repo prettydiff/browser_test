@@ -32,9 +32,7 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
                 }()),
                 exit = function terminal_websites_results_completion_exit(messageText:string, exitType:0|1):void {
                     log([messageText, "\u0007"], true);
-                    if (noClose === false) {
-                        message.sendClose(exitType);
-                    }
+                    message.sendClose(noClose, exitType);
                 };
             vars.verbose = true;
             if (pass === true) {

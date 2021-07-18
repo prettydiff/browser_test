@@ -222,11 +222,11 @@ window.drialRemote = {
     }()),
 
     /* Executes the delay test unit if a given test has a delay property */
-    delay: function browser_remote_delay(config:testBrowserItem):void {console.log(Date.now()+" "+config.name);
+    delay: function browser_remote_delay(config:testBrowserItem):void {
         let a:number = 0;
         const delay:number = 50,
             maxTries:number = 200,
-            delayFunction = function browser_remote_delay_timeout():void {console.log(Date.now()+" "+config.name);
+            delayFunction = function browser_remote_delay_timeout():void {
                 const testResult:[boolean, string, string] = window.drialRemote.evaluate(config.delay);
                 if (testResult[0] === true) {
                     if (config.unit.length > 0) {
@@ -438,6 +438,7 @@ window.drialRemote = {
                                     ctrlKey: window.drialRemote.keyControl,
                                     shiftKey: window.drialRemote.keyShift
                                 });
+                                event.initEvent(config.event, true, true);
                                 element.dispatchEvent(event);
                             } else {
                                 event = document.createEvent("Event");

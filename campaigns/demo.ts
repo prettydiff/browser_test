@@ -54,8 +54,8 @@ const demo:campaign = {
                 {
                     event: "click",
                     node: [
-                        ["getElementById", "highlight-lowlight-carousel", null],
-                        ["getElementsByTagName", "a", 0]
+                        ["getElementById", "mastheadPartialContent", null],
+                        ["getElementsByClassName", "masthead-content", 0]
                     ]
                 }
             ],
@@ -71,29 +71,72 @@ const demo:campaign = {
             ]
         },
 
-        // an interaction that launches a modal
+        // evaluate a modal in the page
         {
             delay: {
                 node: [
-                    ["getElementById", "modal", null],
-                    ["getElementsByTagName", "strong", 0]
+                    ["getElementById", "modal", null]
                 ],
                 qualifier: "is",
-                target: ["innerHTML"],
+                target: ["style", "display"],
                 type: "property",
-                value: "No monthly maintenance fee for:"
+                value: "flex"
             },
             interaction: [
                 {
                     event: "click",
                     node: [
-                        ["getElementById", "ProductDetails_P3_Opt1_LearnMore", null]
+                        ["getElementById", "ProductDetails_P3_Opt3_LearnMore", null]
                     ]
-                },
+                }
             ],
-            name: "Open the first 'Learn More' modal",
+            name: "Evaluate a modal in the page",
             unit: [
+                {
+                    node: [
+                        ["getElementById", "modal", null],
+                        ["getElementsByTagName", "strong", 0]
+                    ],
+                    qualifier: "is",
+                    target: ["innerHTML"],
+                    type: "property",
+                    value: "No monthly maintenance fee for:"
+                },
+                {
+                    node: [
+                        ["getElementById", "modal", null],
+                        ["getElementsByClassName", "text--regalRed", 1],
+                        ["getElementsByTagName", "strong", 0]
+                    ],
+                    qualifier: "is",
+                    target: ["innerHTML"],
+                    type: "property",
+                    value: "$4.95"
+                }
             ]
+        },
+
+        // close the modal
+        {
+            delay: {
+                node: [
+                    ["getElementById", "modal", null]
+                ],
+                qualifier: "is",
+                target: ["style", "display"],
+                type: "property",
+                value: "none"
+            },
+            interaction: [
+                {
+                    event: "click",
+                    node: [
+                        ["getElementById", "Modal_Close", null]
+                    ]
+                }
+            ],
+            name: "Close the modal",
+            unit: []
         }
     ]
 };

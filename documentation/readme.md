@@ -8,5 +8,5 @@ These markdown files comprise the project's current informal notes and formal re
 * **[commands.md](commands.md)**           - This documentation describes the various supported terminal commands and is automatically generated from `lib/terminal/utilities/commands_documentation.ts`.
 * **[configuration.md](configuration.md)** - How to use and modify this application.
 * **[library_list.md](library_list.md)**   - Automated list of all code and documentation files with brief descriptions.
-* **[problems.md](problems.md)**           - A list of problems external to this application I have encountered and have not solved.
+* **[problems.md](problems.md)**           - A list of problems I have encountered and have not solved.
 * **[website_tests.md](website_tests.md)** - How this application defines tests for websites.

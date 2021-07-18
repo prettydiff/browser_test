@@ -11,7 +11,8 @@ import WebSocket from "../../ws-es6/index.js";
 let id:number = 0,
     frameId:string = "",
     testIndex:number = 0,
-    tests:testBrowserItem[] = null;
+    tests:testBrowserItem[] = null,
+    finished:boolean = false;
 const message = function terminal_websites_message(config:browserMessageConfig):void {
         let loaderId:string = "",
             remote:string = "";
@@ -73,27 +74,32 @@ message.send = function terminal_websites_message_send(method:string, params?:an
         params: params
     }));
 };
-message.sendClose = function terminal_websites_message_sendClose(exitType:0|1):void {
+message.sendClose = function terminal_websites_message_sendClose(noClose:boolean, exitType:0|1):void {
     // close the browser
-    message.send("Browser.close");
-    process.exit(exitType);
+    finished = true;
+    if (noClose === false) {
+        message.send("Browser.close");
+        process.exit(exitType);
+    }
 };
 message.sendTest = function terminal_websites_message_sendTest(index:number, refresh:boolean):void {
-    // send a test
-    const route:testBrowserRoute = {
-        action: "result",
-        exit: null,
-        index: index,
-        result: null,
-        test: tests[index]
-    };
-    if (refresh === true) {
-        route.test.interaction = null;
+    if (finished === false) {
+        // send a test
+        const route:testBrowserRoute = {
+            action: "result",
+            exit: null,
+            index: index,
+            result: null,
+            test: tests[index]
+        };
+        if (refresh === true) {
+            route.test.interaction = null;
+        }
+        testIndex = route.index;
+        message.send("Runtime.evaluate", {
+            expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\\'")}')`
+        });
     }
-    testIndex = route.index;
-    message.send("Runtime.evaluate", {
-        expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\\'")}')`
-    });
 };
 message.ws = null;
 
