@@ -3,12 +3,12 @@
 import humanTime from "../utilities/humanTime.js";
 import iterate from "./iterate.js";
 import log from "../utilities/log.js";
+import message from "./message.js";
 import vars from "../utilities/vars.js";
 
 const results = function terminal_test_results(item:testBrowserRoute, tests:testBrowserItem[], noClose:boolean):void {
     let a:number = 0,
         falseFlag:boolean = false,
-        finished:boolean = true,
         index:number = -1;
     const result: [boolean, string, string][] = item.result,
         length:number = result.length,
@@ -30,13 +30,11 @@ const results = function terminal_test_results(item:testBrowserRoute, tests:test
                     } while (aa > 0);
                     return bb;
                 }()),
-                exit = function terminal_test_results_completion_exit(message:string, exitType:0|1):void {
-                    if (finished === true) {
-                        return;
+                exit = function terminal_test_results_completion_exit(messageText:string, exitType:0|1):void {
+                    log([messageText, "\u0007"]);
+                    if (noClose === false) {
+                        message.sendClose(exitType);
                     }
-                    finished = true;
-                    log([message, "\u0007"]);
-                    process.exit(exitType);
                 };
             vars.verbose = true;
             if (pass === true) {

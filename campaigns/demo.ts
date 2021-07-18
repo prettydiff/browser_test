@@ -25,7 +25,7 @@ const demo:campaign = {
             interaction: null,
             name: "Verify artifacts on Bank of America home page",
             unit: [
-                    {
+                {
                     node: [
                         ["getElementById", "globalInputsValidationForm", null],
                         ["getElementsByTagName", "button", 0]
@@ -41,31 +41,32 @@ const demo:campaign = {
         // the interaction specified here will change the page
         {
             delay: {
-                node: [],
-                qualifier: "contains",
-                target: ["window", "location", "href"],
+                node: [
+                    ["getElementsByClassName", "accounts__card__middle", 2],
+                    ["getElementsByTagName", "p", 0]
+                ],
+                qualifier: "is",
+                target: ["innerHTML"],
                 type: "property",
-                value: "advantage_banking/?"
+                value: "$100 opening deposit"
             },
             interaction: [
                 {
                     event: "click",
                     node: [
-                        ["getElementById", "advaBankSHLCta", null]
+                        ["getElementById", "highlight-lowlight-carousel", null],
+                        ["getElementsByTagName", "a", 0]
                     ]
                 }
             ],
             name: "Click into 'Open a checking account'",
             unit: [
                 {
-                    node: [
-                        ["getElementsByClassName", "accounts__card__middle", 2],
-                        ["getElementsByTagName", "p", 0]
-                    ],
-                    qualifier: "is",
-                    target: ["innerHTML"],
+                    node: [],
+                    qualifier: "contains",
+                    target: ["window", "location", "href"],
                     type: "property",
-                    value: "$25 opening deposit"
+                    value: "advantage_banking/?"
                 }
             ]
         },

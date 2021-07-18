@@ -48,7 +48,7 @@ const message = function terminal_test_message(config:browserMessageConfig):void
                 sendRemote();
             } else if (data.indexOf("{\"method\":\"Page.frameStoppedLoading\"") === 0 && data.indexOf(frameId) > 0) {
                 // send a test
-                message.sendTest(testIndex);
+                message.sendTest(testIndex, true);
             } else if (data.indexOf("{\"method\":\"Runtime.consoleAPICalled\"") === 0 && data.indexOf("Drial - report") > 0) {
                 // reading a test result from the browser
                 const result:testBrowserRoute = JSON.parse(JSON.parse(data).params.args[0].value.replace("Drial - report:", ""));
@@ -73,7 +73,12 @@ message.send = function terminal_test_message_send(method:string, params?:any):v
         params: params
     }));
 };
-message.sendTest = function terminal_test_message_sendTest(index:number):void {
+message.sendClose = function terminal_test_message_sendClose(exitType:0|1):void {
+    // close the browser
+    message.send("Browser.close");
+    process.exit(exitType);
+};
+message.sendTest = function terminal_test_message_sendTest(index:number, refresh:boolean):void {
     // send a test
     const route:testBrowserRoute = {
         action: "result",
@@ -82,9 +87,12 @@ message.sendTest = function terminal_test_message_sendTest(index:number):void {
         result: null,
         test: tests[index]
     };
+    if (refresh === true) {
+        route.test.interaction = null;
+    }
     testIndex = route.index;
     message.send("Runtime.evaluate", {
-        expression: `window.drialRemote.parse('${JSON.stringify(route)}')`
+        expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\\'")}')`
     });
 };
 message.ws = null;

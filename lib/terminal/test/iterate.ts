@@ -76,7 +76,7 @@ const iterate = function terminal_test_application_browser_iterate(tests:testBro
     if (validate() === true) {
         const prior:testBrowserEvent[] = tests[index - 1].interaction;
         if (index === 0 || (index > 0 && (prior === null || prior.length === 0 || prior[0].event !== "refresh"))) {
-            message.sendTest(index);
+            message.sendTest(index, false);
         } else if (delayBrowser === true) {
             const second:number = (wait / 1000),
                 plural:string = (second === 1)

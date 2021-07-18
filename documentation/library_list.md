@@ -8,8 +8,6 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[commands.md](commands.md)**                                                                                 - This documentation describes the various supported terminal commands and is automatically generated from `lib/terminal/utilities/commands_documentation.ts`.
    - **[library_list.md](library_list.md)**                                                                         - Automated list of all code and documentation files with brief descriptions.
    - **[test_execution.md](test_execution.md)**                                                                     - How this application achieves test automation.
-* Directory *[../lib](../lib)*
-   - **[../lib/machines.ts](../lib/machines.ts)**                                                                   - A storage of machines for connectivity in peer-to-peer testing.
 * Directory *[../lib/browser](../lib/browser)*
    - **[../lib/browser/remote.ts](../lib/browser/remote.ts)**                                                       - A collection of instructions to allow event execution from outside the browser, like a remote control.
 * Directory *[../lib/common](../lib/common)*
