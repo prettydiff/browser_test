@@ -24,6 +24,7 @@ const message = function terminal_websites_message(config:browserMessageConfig):
                 });
             };
         tests = config.campaign.tests;
+        // create a web socket client
         message.ws = new WebSocket(list[0].webSocketDebuggerUrl, {perMessageDeflate: false});
         message.ws.on("open", function terminal_websites_message_wsOpen():void {
             vars.node.fs.readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:string):void {
@@ -56,6 +57,7 @@ const message = function terminal_websites_message(config:browserMessageConfig):
                 results(result, config.campaign.tests, config.options.noClose);
             } else if (loaderId === "" && data.indexOf("{\"method\":\"Network.requestWillBeSent\"") === 0 && data.indexOf(config.campaign.startPage) > 0) {
                 // grab the session identifiers when the test starts
+                // eslint-disable-next-line
                 const payload:any = JSON.parse(data);
                 frameId = payload.params.frameId;
                 loaderId = payload.params.loaderId;
@@ -65,6 +67,7 @@ const message = function terminal_websites_message(config:browserMessageConfig):
             //}
         });
     };
+// every message to CDP must have a unique id
 // eslint-disable-next-line
 message.send = function terminal_websites_message_send(method:string, params?:any):void {
     id = id + 1;
@@ -97,7 +100,7 @@ message.sendTest = function terminal_websites_message_sendTest(index:number, ref
         }
         testIndex = route.index;
         message.send("Runtime.evaluate", {
-            expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\\'")}')`
+            expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`
         });
     }
 };

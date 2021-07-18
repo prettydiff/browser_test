@@ -14,6 +14,7 @@ const iterate = function terminal_websites_iterate(tests:testBrowserItem[], inde
             `Test ${index + 1} malformed: ${vars.text.angry + tests[index].name + vars.text.none}`,
             ""
         ],
+        // check for a browser wait event in the current test
         wait:number = (function terminal_websites_iterate_wait():number {
             let a:number = tests[index].interaction.length,
                 value:number = 0,
@@ -37,11 +38,6 @@ const iterate = function terminal_websites_iterate(tests:testBrowserItem[], inde
             }
             return count;
         }()),
-        waitText = function terminal_websites_iterate_waitText():string {
-            return (delayMessage === "" && wait > 0)
-                ? `Pausing for 'wait' event in browser.`
-                : delayMessage;
-        },
         // determine if non-interactive events have required matching data properties
         validate = function terminal_websites_iterate_validate():boolean {
             let a:number = 0;
@@ -81,7 +77,12 @@ const iterate = function terminal_websites_iterate(tests:testBrowserItem[], inde
             const second:number = (wait / 1000),
                 plural:string = (second === 1)
                     ? ""
-                    : "s";
+                    : "s",
+                waitText = function terminal_websites_iterate_waitText():string {
+                    return (delayMessage === "" && wait > 0)
+                        ? "Pausing for 'wait' event in browser."
+                        : delayMessage;
+                };
             log([`${humanTime(false)}Delaying for ${vars.text.cyan + second + vars.text.none} second${plural}: ${vars.text.cyan + waitText() + vars.text.none}`]);
         }
     } else {

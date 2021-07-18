@@ -1,7 +1,5 @@
 /* lib/terminal/utilities/configuration - Stores configuration values. */
 
-import vars from "./vars.js";
-
 // * browser name (object key) is a proper identifier used to launch the browser as a command
 // * command should be the full list of arguments associated with the given browser except port number
 const chrome:string = "--user-data-dir=\"\" --enable-logging --v=0 --no-first-run --no-default-browser-check --remote-debugging-port=",

@@ -19,6 +19,8 @@ const listener = function terminal_websites_listener(campaign:campaign, options:
             path: "/json/list",
             port: options.port
         },
+        // issue a client request
+        // the request must be http, not https, or this will fail since the browser are only listening on http
         clientRequest:ClientRequest = vars.node.http.request(payload, function terminal_websites_listener_session(response:IncomingMessage):void {
             const chunks:Buffer[] = [];
             response.setEncoding("utf8");

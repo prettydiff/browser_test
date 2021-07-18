@@ -13,6 +13,8 @@ const websites = function terminal_websites_index(options:websitesInput):void {
     configuration.campaignLocation = (configuration.campaignLocation === "")
         ? `${vars.js}campaigns`
         : configuration.campaignLocation.replace(/(\/|\\)$/, "");
+
+    // read the campaign file
     vars.node.fs.stat(`${configuration.campaignLocation + vars.sep + options.campaignName}.js`, function terminal_websites_index_campaign(err:Error):void {
         if (err === null) {
             // @ts-ignore - this is working correct because es2020 is set in the tsconfig, but the ide doesn't see it

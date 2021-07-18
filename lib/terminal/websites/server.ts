@@ -13,6 +13,8 @@ const server:Server = vars.node.http.createServer(function terminal_websites_ser
         ended:boolean = false;
     const decoder:StringDecoder = new StringDecoder("utf8"),
         contentLength:number = Number(request.headers["content-length"]),
+
+        // a handler for chunk encoded data
         requestData = function terminal_websites_server_requestData(data:Buffer):void {
             body = body + decoder.write(data);
             if (body.length > contentLength) {
@@ -22,6 +24,8 @@ const server:Server = vars.node.http.createServer(function terminal_websites_ser
                 });
             }
         },
+
+        // handler for a completed response to a request
         requestEnd = function terminal_websites_server_requestEnd():void {
             const message:string = `Response from terminal. Request body size: ${body.length}`,
                 readStream:Readable = vars.node.stream.Readable.from(message);
@@ -38,6 +42,8 @@ const server:Server = vars.node.http.createServer(function terminal_websites_ser
             serverResponse.writeHead(200, {"content-type": "text/plain"});
             readStream.pipe(serverResponse);
         },
+
+        // error handler for a request
         requestError = function terminal_websites_server_requestError(errorMessage:NodeJS.ErrnoException):void {
             const errorString:string = errorMessage.toString();
             if (errorMessage.code !== "ETIMEDOUT" && (ended === false || (ended === true && errorString !== "Error: aborted"))) {

@@ -13,6 +13,8 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
     const result: [boolean, string, string][] = item.result,
         length:number = result.length,
         delay:boolean = (tests[item.index].unit.length === 0),
+
+        // handles the completion of a test whether a failure or 100% pass
         completion = function terminal_websites_results_completion(pass:boolean):void {
             const plural:string = (tests.length === 1)
                     ? ""
@@ -44,12 +46,16 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
             }
             exit(`${humanTime(false) + vars.text.angry}Failed${vars.text.none} on test ${vars.text.angry + (index + 1) + vars.text.none}: "${vars.text.cyan + tests[index].name + vars.text.none}" out of ${tests.length} total test${plural} and ${totalTests} evaluations.`, 1);
         },
+
+        // the summary messaging
         summary = function terminal_websites_results_summary(pass:boolean):string {
             const resultString:string = (pass === true)
                     ? `${vars.text.green}Passed`
                     : `${vars.text.angry}Failed`;
             return `${humanTime(false) + resultString} ${index + 1}: ${vars.text.none + tests[index].name}`;
         },
+
+        // build a string that provides representative DOM method chain for executing in the browser console
         buildNode = function terminal_websites_results_buildNode(config:testBrowserTest, elementOnly:boolean):string {
             let b:number = 0;
             const node:browserDOM[] = config.node,
@@ -94,6 +100,8 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
             }
             return output.join("");
         },
+
+        // a prase builder for the various comparative failures
         testString = function terminal_websites_results_testString(pass:boolean, config:testBrowserTest):string {
             const valueStore:primitive = config.value,
                 valueType:string = typeof valueStore,
@@ -142,6 +150,8 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
                 nodeString = `${vars.text.none} ${buildNode(config, false)} ${qualifier}\n${value.replace(/^"/, "").replace(/"$/, "")}`;
             return star + resultString + nodeString;
         },
+
+        // builds out failure messaging, especially for JavaScript errors encountered through interaction
         failureMessage = function terminal_websites_results_failureMessage():void {
             if (result[a][2] === "error") {
                 const error:string = result[a][1]

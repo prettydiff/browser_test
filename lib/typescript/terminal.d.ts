@@ -60,7 +60,7 @@ declare global {
         campaignLocation: string;
         browserLaunch: {
             [key:string]: string;
-        }
+        };
     }
     // ------------------------------------
 

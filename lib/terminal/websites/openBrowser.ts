@@ -13,6 +13,8 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             : (process.platform === "win32")
                 ? "start"
                 : "xdg-open",
+
+        // wrapper for a setTimeout to ensure the browser is open before issuing commands
         delayStart = function terminal_websites_openBrowser_delayStart(err:Error):void {
             if (err === null) {
                 const filePath:string = (chrome === true)
@@ -23,7 +25,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                             listener(campaign, options, server);
                         };
                         if (options.port === 0) {
-                            // at this time I don't how to read the service port from Firefox
+                            // at this time I don't how to read a dynamic service port from Firefox
                             if (configuration.browserLaunch[name].indexOf("-MOZ_LOG") > -1) {
                                 error([
                                     `${vars.text.angry}An explicit port value must be provided for Firefox based browsers.${vars.text.none}`,
@@ -48,6 +50,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                             }, listenWrapper);
                         }
                     };
+                // the actual delay
                 setTimeout(timeout, options.delay);
             } else {
                 error([err.toString()], 1);
@@ -70,6 +73,8 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                     : configuration.browserLaunch[name].replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE "${firefoxLogs}" `);
             return `${keyword} ${name} ${base + options.port}`;
         }());
+
+    // unsupported browser
     if (configuration.browserLaunch[name] === undefined) {
         error([
             `${vars.text.angry}Specified browser ${name} is not supported.${vars.text.none}`,
