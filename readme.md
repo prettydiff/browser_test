@@ -22,6 +22,6 @@ Much of this project's code is ripped straight from [Share File Systems](https:/
 
 ## Run it
 
-* `drial test browser:chrome`
-* For more options try the documentation `drial commands test`
+* `drial websites browser:chrome`
+* For more options try the documentation `drial commands websites`
 * See the documentation for things like additional command guidance, browser research, how this application works.

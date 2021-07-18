@@ -1,8 +1,8 @@
 
-/* lib/terminal/commands/test - A command driven wrapper for all test utilities. */
+/* lib/terminal/commands/websites - A command driven wrapper for all test utilities. */
 
 import error from "../utilities/error.js";
-import websites from "../test/websites.js";
+import websites from "../websites/index.js";
 import vars from "../utilities/vars.js";
 
 // run the test suite using the build application
@@ -38,12 +38,13 @@ const test = function terminal_commands_test():void {
                 return numb;
             }())
         };
+    vars.verbose = true;
 
     // evaluate if a campaign is specified
     if (options.campaignName === null) {
         error([
             `${vars.text.angry}A campaign name is required, but it is missing.${vars.text.none}`,
-            `Example: ${vars.text.cyan}drial test campaign:demo${vars.text.none}`
+            `Example: ${vars.text.cyan}drial websites campaign:demo${vars.text.none}`
         ], 1);
     }
 

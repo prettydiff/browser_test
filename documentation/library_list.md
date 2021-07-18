@@ -21,17 +21,9 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[../lib/terminal/commands/lint.ts](../lib/terminal/commands/lint.ts)**                                       - A command driven wrapper for executing external application ESLint.
    - **[../lib/terminal/commands/mkdir.ts](../lib/terminal/commands/mkdir.ts)**                                     - A utility for recursively creating directories in the file system.
    - **[../lib/terminal/commands/remove.ts](../lib/terminal/commands/remove.ts)**                                   - A command driven utility to recursively remove file system artifacts.
-   - **[../lib/terminal/commands/test.ts](../lib/terminal/commands/test.ts)**                                       - A command driven wrapper for all test utilities.
    - **[../lib/terminal/commands/update.ts](../lib/terminal/commands/update.ts)**                                   - A command to update the application from git and then run the build.
    - **[../lib/terminal/commands/version.ts](../lib/terminal/commands/version.ts)**                                 - A command utility for expressing the application's version.
-* Directory *[../lib/terminal/test](../lib/terminal/test)*
-   - **[../lib/terminal/test/iterate.ts](../lib/terminal/test/iterate.ts)**                                         - Push the next test item.
-   - **[../lib/terminal/test/listener.ts](../lib/terminal/test/listener.ts)**                                       - A service listener that processes input and output to the web browser.
-   - **[../lib/terminal/test/message.ts](../lib/terminal/test/message.ts)**                                         - Message input/output to the browser via Chrome Developer Tools Protocol (CDP).
-   - **[../lib/terminal/test/openBrowser.ts](../lib/terminal/test/openBrowser.ts)**                                 - Launches the web browser with all necessary configurations in place.
-   - **[../lib/terminal/test/results.ts](../lib/terminal/test/results.ts)**                                         - Processes test result data into output for humans to read.
-   - **[../lib/terminal/test/server.ts](../lib/terminal/test/server.ts)**                                           - A simple HTTP server to keep the application open listening for browser output.
-   - **[../lib/terminal/test/websites.ts](../lib/terminal/test/websites.ts)**                                       - The code that allows testing of websites.
+   - **[../lib/terminal/commands/websites.ts](../lib/terminal/commands/websites.ts)**                               - A command driven wrapper for all test utilities.
 * Directory *[../lib/terminal/utilities](../lib/terminal/utilities)*
    - **[../lib/terminal/utilities/commandList.ts](../lib/terminal/utilities/commandList.ts)**                       - Groups all supported command functions into an object for single point of reference.
    - **[../lib/terminal/utilities/commandName.ts](../lib/terminal/utilities/commandName.ts)**                       - A library for visually presenting command documentation to the terminal.
@@ -46,6 +38,14 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[../lib/terminal/utilities/time.ts](../lib/terminal/utilities/time.ts)**                                     - Generates a timestamp in format: "[HH:mm:ss:mil] message".
    - **[../lib/terminal/utilities/vars.ts](../lib/terminal/utilities/vars.ts)**                                     - Globally available variables for the terminal utility.
    - **[../lib/terminal/utilities/wrapIt.ts](../lib/terminal/utilities/wrapIt.ts)**                                 - A tool to perform word wrap when printing text to the shell.
+* Directory *[../lib/terminal/websites](../lib/terminal/websites)*
+   - **[../lib/terminal/websites/index.ts](../lib/terminal/websites/index.ts)**                                     - The code that allows testing of websites.
+   - **[../lib/terminal/websites/iterate.ts](../lib/terminal/websites/iterate.ts)**                                 - Push the next test item.
+   - **[../lib/terminal/websites/listener.ts](../lib/terminal/websites/listener.ts)**                               - A service listener that processes input and output to the web browser.
+   - **[../lib/terminal/websites/message.ts](../lib/terminal/websites/message.ts)**                                 - Message input/output to the browser via Chrome Developer Tools Protocol (CDP).
+   - **[../lib/terminal/websites/openBrowser.ts](../lib/terminal/websites/openBrowser.ts)**                         - Launches the web browser with all necessary configurations in place.
+   - **[../lib/terminal/websites/results.ts](../lib/terminal/websites/results.ts)**                                 - Processes test result data into output for humans to read.
+   - **[../lib/terminal/websites/server.ts](../lib/terminal/websites/server.ts)**                                   - A simple HTTP server to keep the application open listening for browser output.
 * Directory *[../lib/typescript](../lib/typescript)*
    - **[../lib/typescript/browser.d.ts](../lib/typescript/browser.d.ts)**                                           - TypeScript interfaces used by browser specific libraries.
    - **[../lib/typescript/environment.d.ts](../lib/typescript/environment.d.ts)**                                   - TypeScript interfaces that define environmental objects.

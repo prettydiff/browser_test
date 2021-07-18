@@ -1,5 +1,5 @@
 
-/* lib/terminal/test/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
+/* lib/terminal/websites/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
 
 import error from "../utilities/error.js";
 import results from "./results.js";
@@ -12,20 +12,20 @@ let id:number = 0,
     frameId:string = "",
     testIndex:number = 0,
     tests:testBrowserItem[] = null;
-const message = function terminal_test_message(config:browserMessageConfig):void {
+const message = function terminal_websites_message(config:browserMessageConfig):void {
         let loaderId:string = "",
             remote:string = "";
         // eslint-disable-next-line
         const list:any = JSON.parse(config.responseBody),
-            sendRemote = function terminal_test_message_session_sendRemote():void {
+            sendRemote = function terminal_websites_message_sendRemote():void {
                 message.send("Page.addScriptToEvaluateOnNewDocument", {
                     source: remote
                 });
             };
         tests = config.campaign.tests;
         message.ws = new WebSocket(list[0].webSocketDebuggerUrl, {perMessageDeflate: false});
-        message.ws.on("open", function terminal_test_message_wsOpen():void {
-            vars.node.fs.readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_test_message_wsOpen_readRemote(readError:Error, fileData:string):void {
+        message.ws.on("open", function terminal_websites_message_wsOpen():void {
+            vars.node.fs.readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:string):void {
                 if (readError === null) {
                     remote = fileData.toString().replace(/serverPort:\s+\d+,/, `serverPort: ${config.serverAddress.port},`).replace("export {}", "");
                     message.send("Network.enable");
@@ -42,7 +42,7 @@ const message = function terminal_test_message(config:browserMessageConfig):void
                 }
             });
         });
-        message.ws.on("message", function terminal_test_message_wsMessage(data:string):void {
+        message.ws.on("message", function terminal_websites_message_wsMessage(data:string):void {
             if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0 && data.indexOf(loaderId) > 0) {
                 // inject code into next requested page
                 sendRemote();
@@ -65,7 +65,7 @@ const message = function terminal_test_message(config:browserMessageConfig):void
         });
     };
 // eslint-disable-next-line
-message.send = function terminal_test_message_send(method:string, params?:any):void {
+message.send = function terminal_websites_message_send(method:string, params?:any):void {
     id = id + 1;
     message.ws.send(JSON.stringify({
         id: id,
@@ -73,12 +73,12 @@ message.send = function terminal_test_message_send(method:string, params?:any):v
         params: params
     }));
 };
-message.sendClose = function terminal_test_message_sendClose(exitType:0|1):void {
+message.sendClose = function terminal_websites_message_sendClose(exitType:0|1):void {
     // close the browser
     message.send("Browser.close");
     process.exit(exitType);
 };
-message.sendTest = function terminal_test_message_sendTest(index:number, refresh:boolean):void {
+message.sendTest = function terminal_websites_message_sendTest(index:number, refresh:boolean):void {
     // send a test
     const route:testBrowserRoute = {
         action: "result",

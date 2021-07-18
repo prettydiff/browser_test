@@ -8,9 +8,9 @@ import get from "../commands/get.js";
 import lint from "../commands/lint.js";
 import mkdir from "../commands/mkdir.js";
 import remove from "../commands/remove.js";
-import test from "../commands/test.js";
 import update from "../commands/update.js";
 import version from "../commands/version.js";
+import websites from "../commands/websites.js";
 
 const commandList:commandList = {
     build: build,
@@ -20,9 +20,9 @@ const commandList:commandList = {
     lint: lint,
     mkdir: mkdir,
     remove: remove,
-    test: test,
     update: update,
-    version: version
+    version: version,
+    websites: websites
 };
 
 export default commandList;

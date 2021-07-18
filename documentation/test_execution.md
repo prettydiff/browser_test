@@ -42,11 +42,11 @@ The tests specify locations in the browser using standard DOM methods and custom
 ## Demonstration using this application
 From the terminal use this command to run the browser test automation:
 
-`drial test browser:firefox port:9000`
+`drial websites browser:firefox port:9000`
 
 For options associated with any command please see the command documentation:
 
-`drial commands test`
+`drial commands websites`
 
 ---
 
@@ -143,7 +143,8 @@ Once a test reports failure or all tests are complete there is a final timed del
 The necessary code is almost exclusively located in these files:
 
 * [../lib/browser/remote.ts](../lib/browser/remote.ts) - event execution, DOM traversal, and test evaluation
-* [../lib/terminal/commands/test.ts](../lib/terminal/commands/test.ts) - test application
+* [../lib/terminal/commands/websites.ts](../lib/terminal/commands/websites.ts) - command interpreter
+* [../lib/terminal/websites/readme.md](../lib/terminal/websites/readme.md) - list of libraries used in the test of websites
 
 All test evaluation occurs in the remote.ts file, which almost exclusively consists of DOM traversal and event execution.  At this time the test automation is capable of executing all user events except events associated cursor movement.  The second file, browser.ts, starts the necessary service, opens the browser for testing, and stores the test instructions.
 

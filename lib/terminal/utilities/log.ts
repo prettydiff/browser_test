@@ -7,9 +7,6 @@ import vars from "./vars.js";
 const log = function terminal_utilities_log(output:string[], end?:boolean):void {
     // eslint-disable-next-line
     const logger:(input:string) => void = console.log;
-    if (vars.verbose === true && (output.length > 1 || output[0] !== "")) {
-        logger("");
-    }
     if (output[output.length - 1] === "") {
         output.pop();
     }
@@ -17,7 +14,7 @@ const log = function terminal_utilities_log(output:string[], end?:boolean):void 
         logger(value);
     });
     if (end === true) {
-        if (vars.verbose === true || vars.command === "test" || vars.command === "version") {
+        if (vars.verbose === true) {
             logger("");
             logger("________________________________________________");
             logger(`Version ${vars.text.angry + vars.version + vars.text.none}`);
@@ -25,7 +22,7 @@ const log = function terminal_utilities_log(output:string[], end?:boolean):void 
             logger(`git Log ${vars.text.cyan + vars.text.bold + vars.git_hash + vars.text.none}`);
             logger("\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e\u203e");
         }
-        if (vars.verbose === true && vars.command !== "test" && vars.command !== "version") {
+        if (vars.verbose === true && vars.command !== "websites" && vars.command !== "version") {
             humanTime(true);
         }
     }

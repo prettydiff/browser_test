@@ -11,6 +11,6 @@ The terminal libraries that executable as either an included library or as a com
 * **[lint.ts](lint.ts)**           - A command driven wrapper for executing external application ESLint.
 * **[mkdir.ts](mkdir.ts)**         - A utility for recursively creating directories in the file system.
 * **[remove.ts](remove.ts)**       - A command driven utility to recursively remove file system artifacts.
-* **[test.ts](test.ts)**           - A command driven wrapper for all test utilities.
 * **[update.ts](update.ts)**       - A command to update the application from git and then run the build.
 * **[version.ts](version.ts)**     - A command utility for expressing the application's version.
+* **[websites.ts](websites.ts)**   - A command driven wrapper for all test utilities.

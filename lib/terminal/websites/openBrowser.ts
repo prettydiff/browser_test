@@ -1,25 +1,25 @@
 
-/* lib/terminal/test/openBrowser - Launches the web browser with all necessary configurations in place. */
+/* lib/terminal/websites/openBrowser - Launches the web browser with all necessary configurations in place. */
 
 import error from "../utilities/error.js";
 import listener from "./listener.js";
 import server from "./server.js";
 import vars from "../utilities/vars.js";
 
-const openBrowser = function terminal_test_openBrowser(campaign:campaign, options:websitesInput, configuration:configuration):void {
+const openBrowser = function terminal_websites_openBrowser(campaign:campaign, options:websitesInput, configuration:configuration):void {
     // this delay is necessary to launch the browser and allow it open before sending it commands
     const keyword:"open"|"start"|"xdg-open" = (process.platform === "darwin")
             ? "open"
             : (process.platform === "win32")
                 ? "start"
                 : "xdg-open",
-        delayStart = function terminal_test_openBrowser_delayStart(err:Error):void {
+        delayStart = function terminal_websites_openBrowser_delayStart(err:Error):void {
             if (err === null) {
                 const filePath:string = (configuration.browserLaunch[name].indexOf("user-data-dir=") > 0)
                         ? `${logPathChrome + vars.sep}DevToolsActivePort`
                         : logPathFirefox,
-                    timeout = function terminal_test_openBrowser_delayStart_timeout():void {
-                        const listenWrapper = function terminal_test_openBrowser_delayStart_timeout_listenWrapper():void {
+                    timeout = function terminal_websites_openBrowser_delayStart_timeout():void {
+                        const listenWrapper = function terminal_websites_openBrowser_delayStart_timeout_listenWrapper():void {
                             listener(campaign, options, server);
                         };
                         if (options.port === 0) {
@@ -27,10 +27,11 @@ const openBrowser = function terminal_test_openBrowser(campaign:campaign, option
                             if (configuration.browserLaunch[name].indexOf("-MOZ_LOG") > -1) {
                                 error([
                                     `${vars.text.angry}An explicit port value must be provided for Firefox based browsers.${vars.text.none}`,
-                                    `Example: ${vars.text.cyan}drial test browser:firefox port:9000${vars.text.none}`
+                                    `Example: ${vars.text.cyan}drial websites browser:firefox port:9000${vars.text.none}`,
+                                    `For more guidance on the ${vars.text.green}websites${vars.text.none} command execute: ${vars.text.cyan}drial commands websites${vars.text.none}`
                                 ], 1);
                             } else {
-                                vars.node.fs.readFile(filePath, function terminal_test_openBrowser_delayStart_chromePort(fileError:Error, fileData:Buffer):void {
+                                vars.node.fs.readFile(filePath, function terminal_websites_openBrowser_delayStart_chromePort(fileError:Error, fileData:Buffer):void {
                                     if (fileError === null) {
                                         options.port = Number(fileData.toString().split("\n")[0]);
                                         server.listen({

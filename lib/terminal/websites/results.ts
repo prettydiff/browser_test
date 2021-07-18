@@ -1,4 +1,4 @@
-/* lib/terminal/test/results - Processes test result data into output for humans to read. */
+/* lib/terminal/websites/results - Processes test result data into output for humans to read. */
 
 import humanTime from "../utilities/humanTime.js";
 import iterate from "./iterate.js";
@@ -6,18 +6,18 @@ import log from "../utilities/log.js";
 import message from "./message.js";
 import vars from "../utilities/vars.js";
 
-const results = function terminal_test_results(item:testBrowserRoute, tests:testBrowserItem[], noClose:boolean):void {
+const results = function terminal_websites_results(item:testBrowserRoute, tests:testBrowserItem[], noClose:boolean):void {
     let a:number = 0,
         falseFlag:boolean = false,
         index:number = -1;
     const result: [boolean, string, string][] = item.result,
         length:number = result.length,
         delay:boolean = (tests[item.index].unit.length === 0),
-        completion = function terminal_test_results_completion(pass:boolean):void {
+        completion = function terminal_websites_results_completion(pass:boolean):void {
             const plural:string = (tests.length === 1)
                     ? ""
                     : "s",
-                totalTests:number = (function terminal_test_results_completion_total():number {
+                totalTests:number = (function terminal_websites_results_completion_total():number {
                     // gathers a total count of tests
                     let aa:number = tests.length,
                         bb:number = 0;
@@ -30,8 +30,8 @@ const results = function terminal_test_results(item:testBrowserRoute, tests:test
                     } while (aa > 0);
                     return bb;
                 }()),
-                exit = function terminal_test_results_completion_exit(messageText:string, exitType:0|1):void {
-                    log([messageText, "\u0007"]);
+                exit = function terminal_websites_results_completion_exit(messageText:string, exitType:0|1):void {
+                    log([messageText, "\u0007"], true);
                     if (noClose === false) {
                         message.sendClose(exitType);
                     }
@@ -46,13 +46,13 @@ const results = function terminal_test_results(item:testBrowserRoute, tests:test
             }
             exit(`${humanTime(false) + vars.text.angry}Failed${vars.text.none} on test ${vars.text.angry + (index + 1) + vars.text.none}: "${vars.text.cyan + tests[index].name + vars.text.none}" out of ${tests.length} total test${plural} and ${totalTests} evaluations.`, 1);
         },
-        summary = function terminal_test_results_summary(pass:boolean):string {
+        summary = function terminal_websites_results_summary(pass:boolean):string {
             const resultString:string = (pass === true)
                     ? `${vars.text.green}Passed`
                     : `${vars.text.angry}Failed`;
             return `${humanTime(false) + resultString} ${index + 1}: ${vars.text.none + tests[index].name}`;
         },
-        buildNode = function terminal_test_results_buildNode(config:testBrowserTest, elementOnly:boolean):string {
+        buildNode = function terminal_websites_results_buildNode(config:testBrowserTest, elementOnly:boolean):string {
             let b:number = 0;
             const node:browserDOM[] = config.node,
                 property:string[] = config.target,
@@ -96,7 +96,7 @@ const results = function terminal_test_results(item:testBrowserRoute, tests:test
             }
             return output.join("");
         },
-        testString = function terminal_test_results_testString(pass:boolean, config:testBrowserTest):string {
+        testString = function terminal_websites_results_testString(pass:boolean, config:testBrowserTest):string {
             const valueStore:primitive = config.value,
                 valueType:string = typeof valueStore,
                 value = (valueStore === null)
@@ -144,7 +144,7 @@ const results = function terminal_test_results(item:testBrowserRoute, tests:test
                 nodeString = `${vars.text.none} ${buildNode(config, false)} ${qualifier}\n${value.replace(/^"/, "").replace(/"$/, "")}`;
             return star + resultString + nodeString;
         },
-        failureMessage = function terminal_test_results_failureMessage():void {
+        failureMessage = function terminal_websites_results_failureMessage():void {
             if (result[a][2] === "error") {
                 const error:string = result[a][1]
                     .replace("{\"file\":"   , `{\n    "${vars.text.cyan}file${vars.text.none}"   :`)

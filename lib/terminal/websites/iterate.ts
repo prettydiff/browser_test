@@ -1,12 +1,12 @@
 
-/* lib/terminal/test/iterate - Push the next test item. */
+/* lib/terminal/websites/iterate - Push the next test item. */
 
 import humanTime from "../utilities/humanTime.js";
 import log from "../utilities/log.js";
 import message from "./message.js";
 import vars from "../utilities/vars.js";
 
-const iterate = function terminal_test_application_browser_iterate(tests:testBrowserItem[], index:number, noClose:boolean):void {
+const iterate = function terminal_websites_iterate(tests:testBrowserItem[], index:number, noClose:boolean):void {
     // not writing to settings
     let delayMessage:string = "",
         delayBrowser:boolean = false;
@@ -14,7 +14,7 @@ const iterate = function terminal_test_application_browser_iterate(tests:testBro
             `Test ${index + 1} malformed: ${vars.text.angry + tests[index].name + vars.text.none}`,
             ""
         ],
-        wait:number = (function terminal_test_application_browser_iterate_wait():number {
+        wait:number = (function terminal_websites_iterate_wait():number {
             let a:number = tests[index].interaction.length,
                 value:number = 0,
                 count:number = 0;
@@ -37,18 +37,18 @@ const iterate = function terminal_test_application_browser_iterate(tests:testBro
             }
             return count;
         }()),
-        waitText = function terminal_test_application_browser_iterate_waitText():string {
+        waitText = function terminal_websites_iterate_waitText():string {
             return (delayMessage === "" && wait > 0)
                 ? `Pausing for 'wait' event in browser.`
                 : delayMessage;
         },
         // determine if non-interactive events have required matching data properties
-        validate = function terminal_test_application_browser_iterate_validate():boolean {
+        validate = function terminal_websites_iterate_validate():boolean {
             let a:number = 0;
             const length:number = (tests[index].interaction === null)
                     ? 0
                     : tests[index].interaction.length,
-                eventName = function terminal_test_application_browser_iterate_validate_eventName(property:string):string {
+                eventName = function terminal_websites_iterate_validate_eventName(property:string):string {
                     return `   ${vars.text.angry}*${vars.text.none} Interaction ${a + 1} has event ${vars.text.cyan}setValue${vars.text.none} but no ${vars.text.angry + property + vars.text.none} property.`;
                 };
             if (tests[index].delay === undefined && tests[index].unit.length < 1) {

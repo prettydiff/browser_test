@@ -42,9 +42,9 @@ declare global {
         lint: (callback?:(complete:string, failCount:number) => void) => void;
         mkdir: (dirToMake?:string, callback?:(typeError:string) => void) => void;
         remove: (filePath?:string, callback?:() => void) => void;
-        test: () => void;
         update:() => void;
         version: () => void;
+        websites: () => void;
     }
     interface nodeLists {
         empty_line: boolean;

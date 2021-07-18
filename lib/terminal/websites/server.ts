@@ -1,5 +1,5 @@
 
-/* lib/terminal/test/server - A simple HTTP server to keep the application open listening for browser output. */
+/* lib/terminal/websites/server - A simple HTTP server to keep the application open listening for browser output. */
 
 import { Readable } from "stream";
 import { IncomingMessage, Server, ServerResponse } from "http";
@@ -8,12 +8,12 @@ import { StringDecoder } from "string_decoder";
 import log from "../utilities/log.js";
 import vars from "../utilities/vars.js";
 
-const server:Server = vars.node.http.createServer(function terminal_test_server(request:IncomingMessage, serverResponse:ServerResponse):void {
+const server:Server = vars.node.http.createServer(function terminal_websites_server(request:IncomingMessage, serverResponse:ServerResponse):void {
     let body:string = "",
         ended:boolean = false;
     const decoder:StringDecoder = new StringDecoder("utf8"),
         contentLength:number = Number(request.headers["content-length"]),
-        requestData = function terminal_test_server_requestData(data:Buffer):void {
+        requestData = function terminal_websites_server_requestData(data:Buffer):void {
             body = body + decoder.write(data);
             if (body.length > contentLength) {
                 request.destroy({
@@ -22,7 +22,7 @@ const server:Server = vars.node.http.createServer(function terminal_test_server(
                 });
             }
         },
-        requestEnd = function terminal_test_server_requestEnd():void {
+        requestEnd = function terminal_websites_server_requestEnd():void {
             const message:string = `Response from terminal. Request body size: ${body.length}`,
                 readStream:Readable = vars.node.stream.Readable.from(message);
             ended = true;
@@ -38,7 +38,7 @@ const server:Server = vars.node.http.createServer(function terminal_test_server(
             serverResponse.writeHead(200, {"content-type": "text/plain"});
             readStream.pipe(serverResponse);
         },
-        requestError = function terminal_test_server_requestError(errorMessage:NodeJS.ErrnoException):void {
+        requestError = function terminal_websites_server_requestError(errorMessage:NodeJS.ErrnoException):void {
             const errorString:string = errorMessage.toString();
             if (errorMessage.code !== "ETIMEDOUT" && (ended === false || (ended === true && errorString !== "Error: aborted"))) {
                 log([
