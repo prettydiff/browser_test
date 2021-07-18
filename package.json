@@ -35,13 +35,7 @@
         "type": "git",
         "url": "git+https://github.com/prettydiff/drial.git"
     },
-    "scripts": {
-        "prepublishOnly": "node js/application test",
-        "prerestart": "node js/application build",
-        "restart": "node js/application drial",
-        "start": "node js/application drial",
-        "test": "node js/application test"
-    },
+    "scripts": {},
     "type": "module",
     "version": "0.0.2"
 }
