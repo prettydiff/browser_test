@@ -1,4 +1,4 @@
-<!-- documentation/test_execution - How this application achieves test automation. -->
+<!-- documentation/website_tests - How this application defines tests for websites. -->
 
 # drial - Test Execution in the Browser
 Execute test automation in the browser using just JavaScript and without dependencies.
@@ -42,7 +42,7 @@ The tests specify locations in the browser using standard DOM methods and custom
 ## Demonstration using this application
 From the terminal use this command to run the browser test automation:
 
-`drial websites browser:firefox port:9000`
+`drial websites browser:firefox port:9000 campaign:demo`
 
 For options associated with any command please see the command documentation:
 
@@ -51,7 +51,7 @@ For options associated with any command please see the command documentation:
 ---
 
 ## How this works
-All tests are specified outside the browser.  The code outside the browser determines which tests to execute in which order.  This library sends a given test to the specified browser and waits for evaluation in the browser before sending the next test.  Executing tests in serial order, as opposed to in parallel, is slower but is necessary because often later tests are dependent upon a state dictated by prior tests.
+All tests are specified outside the browser.  The code outside the browser determines which tests to execute in which order.  The test runner sends a given test to the specified browser and waits for evaluation in the browser before sending the next test.  Executing tests in serial order, as opposed to in parallel, is slower but is necessary because often later tests are dependent upon a state dictated by prior tests.
 
 In the browser any event can be arbitrarily created using the method `document.createEvent`.  The event is then executed upon a specified DOM element.  Even mouse movement can be created in this way, **unfortunately there is not a convention available from the browsers to arbitrarily execute cursor movement using code automation so those mouse movement events cannot be executed for evaluation in visually meaningful way.**
 
@@ -82,14 +82,7 @@ action.initEvent(config.event, true, true); // change that second argument from 
 ---
 
 ## Page Refresh events
-### Refresh event
-In the case of a test that needs to refresh the page use the **refresh**.  These limitations apply to the use of *refresh* event:
-
-* The *refresh* must be the only event of the given test.
-* Refresh tests must not contain a *delay* property.
-
-### Refresh-Interaction event
-Some interactions in a page may trigger a page refresh.  In this case a page is refreshed due to specified test events, but not the *refresh* event intentionally called by a test.  To account for a page refresh use the *refresh-interaction* event which instructs the code to not evaluate test units until after a page is refreshed.
+When a page is refreshed the Chrome Developer Tools Protocol (CDP) reports this to this terminal.  The application looks for the `Page.frameStoppedLoading` event for the targeted frame id.  The test that triggered either a refresh or a different page is sent back to the browser, but with its interaction criteria assigned to null.  This ensures browsers events are not repeated, but the corresponding evaluation criteria remains present for evaluation.
 
 ---
 

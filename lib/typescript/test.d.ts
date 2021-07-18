@@ -1,6 +1,5 @@
 /* lib/typescript/test.d - TypeScript interfaces used test automation. */
 
-import { ServerResponse } from "http";
 import { AddressInfo } from "net";
 
 declare global {
@@ -100,6 +99,7 @@ declare global {
         browser: string;
         campaignName: string;
         delay:number;
+        devtools: boolean;
         noClose: boolean;
         port: number;
     }

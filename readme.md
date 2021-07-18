@@ -22,6 +22,6 @@ Much of this project's code is ripped straight from [Share File Systems](https:/
 
 ## Run it
 
-* `drial websites browser:chrome`
-* For more options try the documentation `drial commands websites`
-* See the documentation for things like additional command guidance, browser research, how this application works.
+* `drial websites browser:chrome campaign:demo`
+* For more options try the interactive command documentation `drial commands websites`.
+* See the [documentation](documenatation) for things like additional command guidance, browser research, known problems, how to write tests, and how this application works.

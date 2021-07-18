@@ -21,6 +21,7 @@ The actual documentation per browser.
 ### Chrome
 * **Execution** - `start chrome --enable-logging=stderr --v=1 --no-first-run --no-default-browser-check --remote-debugging-port=9000`
    - Optionally the following flag can also be used to disable same origin policy: `--disable-web-security`
+   - Optionally open the browser with the developer tools already visible: `--auto-open-devtools-for-tabs`
 * **Documentation**
    - Command line options - https://peter.sh/experiments/chromium-command-line-switches/
    - Developer Tools Protocol - https://chromedevtools.github.io/devtools-protocol/
@@ -28,6 +29,7 @@ The actual documentation per browser.
 
 ### Firefox
 * **Execution** - `start firefox -start-debugger-server 9000`
+   - Optionally open the browser with the developer tools already visible: `--devtools`
 * **Documentation**
    - Command line options - https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options?redirectlocale=en-US&redirectslug=Command_Line_Options
    - More Command line options - https://www-archive.mozilla.org/quality/browser/front-end/testcases/cmd-line/

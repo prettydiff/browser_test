@@ -15,9 +15,9 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                 : "xdg-open",
         delayStart = function terminal_websites_openBrowser_delayStart(err:Error):void {
             if (err === null) {
-                const filePath:string = (configuration.browserLaunch[name].indexOf("user-data-dir=") > 0)
-                        ? `${logPathChrome + vars.sep}DevToolsActivePort`
-                        : logPathFirefox,
+                const filePath:string = (chrome === true)
+                        ? `${chromeLogs + vars.sep}DevToolsActivePort`
+                        : firefoxLogs,
                     timeout = function terminal_websites_openBrowser_delayStart_timeout():void {
                         const listenWrapper = function terminal_websites_openBrowser_delayStart_timeout_listenWrapper():void {
                             listener(campaign, options, server);
@@ -52,13 +52,24 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             } else {
                 error([err.toString()], 1);
             }
-        };
-    let name:string = options.browser,
-        logPathChrome:string = "",
-        logPathFirefox:string = "";
-    name = (name === null)
-        ? name = campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
-        : name.toLowerCase().replace(/^edge$/, "msedge");
+        },
+        name:string = (options.browser === null)
+            ? campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
+            : options.browser.toLowerCase().replace(/^edge$/, "msedge"),
+        chromeLogs:string = `${vars.projectPath}lib${vars.sep}logs${vars.sep}chrome`,
+        firefoxLogs:string = `${vars.projectPath}lib${vars.sep}logs${vars.sep}firefox${vars.sep}log`,
+        chrome:boolean = (configuration.browserLaunch[name].indexOf("--user-data-dir=") === 0),
+        // open a browser in the OS with its appropriate flags and port number
+        browserCommand = (function terminal_websites_openBrowser_chrome():string {
+            const base:string = (chrome === true)
+                ? (options.devtools === true)
+                    ? `--auto-open-devtools-for-tabs ${configuration.browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${chromeLogs}"`)}`
+                    : configuration.browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${chromeLogs}"`)
+                : (options.devtools === true)
+                    ? `--devtools ${configuration.browserLaunch[name].replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE "${firefoxLogs}" `)}`
+                    : configuration.browserLaunch[name].replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE "${firefoxLogs}" `);
+            return `${keyword} ${name} ${base + options.port}`;
+        }());
     if (configuration.browserLaunch[name] === undefined) {
         error([
             `${vars.text.angry}Specified browser ${name} is not supported.${vars.text.none}`,
@@ -69,10 +80,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             `${vars.text.angry}*${vars.text.none} Submit a pull request to https://github.com/prettydiff/drial`,
         ], 1);
     }
-    // open a browser in the OS with its appropriate flags and port number
-    logPathChrome = `${vars.projectPath}lib${vars.sep}logs${vars.sep}chrome`;
-    logPathFirefox = `"${vars.projectPath}lib${vars.sep}logs${vars.sep}firefox${vars.sep}log" `;
-    vars.node.child(`${keyword} ${name} ${configuration.browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${logPathChrome}"`).replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE ${logPathFirefox}`) + options.port}`, delayStart);
+    vars.node.child(browserCommand, delayStart);
 };
 
 export default openBrowser;
