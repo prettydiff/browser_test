@@ -334,6 +334,14 @@ window.drialRemote = {
                     delay:number;
                 do {
                     config = item.test.interaction[index];
+                    if (config.event === "historyBack") {
+                        window.history.back();
+                        return;
+                    }
+                    if (config.event === "historyForward") {
+                        window.history.forward();
+                        return;
+                    }
                     if (config.event === "pageAddress") {
                         if (typeof config.value !== "string") {
                             window.drialRemote.send([

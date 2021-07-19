@@ -299,6 +299,8 @@ An example test:
    * *contextmenu* - This standard event executes on right click of an element.
    * *dblclick* - This standard event is fired by a rapid two clicks where the timing of rapid is defined by the operating system.
    * *focus* - This standard event fires when an element becomes active as recognized by the DOM method `document.activeElement()`.
+   * *historyBack* - Equivalent to pressing the browser's back button.  The node and value properties aren't used with this event.
+   * *historyForward* - Equivalent to pressing the browser's forward button.  The node and value properties aren't used with this event.
    * *keydown* - This standard event fires when a keyboard key is pressed and continues to fire multiple times if the key continues to be pressed.  The frequency of repeated event executions is defined by the machine operating system.
    * *keyup* - This standard event fires when a keyboard key that is pressed is then released.
    * *mousedown* - This standard event executes when a mouse button is pressed on a given element.

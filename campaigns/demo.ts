@@ -2,43 +2,14 @@
 
 const demo:campaign = {
     // the initial page to load into the browser
-    startPage: "https://www.bankofamerica.com",
+    startPage: "https://promo.bankofamerica.com/advantage_banking/?cm_sp=DEP-Checking-_-NotAssigned-",
     browser: "chrome",
     // an actual port value must be specified for Firefox type browsers as nobody knows how to find its dynamic port
     // chrome based browsers can accept a port of 0 which will select a random available TCP port
     port: 0,
     tests: [
 
-        // a test with no interactions
-        // this test just verifies artifacts on the start page
-        {
-            delay: {
-                node: [
-                    ["getElementById", "investYourWayHlCta", null],
-                    ["getElementsByClassName", "heading", 0]
-                ],
-                qualifier: "is",
-                target: ["innerHTML"],
-                type: "property",
-                value: "Invest your way"
-            },
-            interaction: null,
-            name: "Verify artifacts on Bank of America home page",
-            unit: [
-                {
-                    node: [
-                        ["getElementById", "globalInputsValidationForm", null],
-                        ["getElementsByTagName", "button", 0]
-                    ],
-                    qualifier: "is",
-                    target: ["id"],
-                    type: "attribute",
-                    value: "signIn"
-                }
-            ]
-        },
-
-        // the interaction specified here will change the page
+        // verify artifacts on the start page
         {
             delay: {
                 node: [
@@ -50,15 +21,7 @@ const demo:campaign = {
                 type: "property",
                 value: "$100 opening deposit"
             },
-            interaction: [
-                {
-                    event: "click",
-                    node: [
-                        ["getElementById", "mastheadPartialContent", null],
-                        ["getElementsByClassName", "masthead-content", 0]
-                    ]
-                }
-            ],
+            interaction: null,
             name: "Click into 'Open a checking account'",
             unit: [
                 {
@@ -160,6 +123,51 @@ const demo:campaign = {
                 }
             ],
             name: "Manually change the page address",
+            unit: []
+        },
+
+        // go back
+        {
+            delay: {
+                node: [
+                    ["getElementsByClassName", "accounts__card__middle", 2],
+                    ["getElementsByTagName", "p", 0]
+                ],
+                qualifier: "is",
+                target: ["innerHTML"],
+                type: "property",
+                value: "$100 opening deposit"
+            },
+            interaction: [
+                {
+                    event: "historyBack",
+                    node: []
+                }
+            ],
+            name: "Go back",
+            unit: []
+        },
+
+        // go forward
+        {
+            delay: {
+                node: [
+                    ["getElementsByTagName", "body", 0],
+                    ["getElementsByTagName", "font", 0],
+                    ["getElementsByTagName", "a", 0]
+                ],
+                qualifier: "is",
+                target: ["innerHTML"],
+                type: "property",
+                value: "Privacy Policy"
+            },
+            interaction: [
+                {
+                    event: "historyForward",
+                    node: []
+                }
+            ],
+            name: "Go forward",
             unit: []
         }
     ]
