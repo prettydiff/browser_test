@@ -301,14 +301,14 @@ An example test:
    * *focus* - This standard event fires when an element becomes active as recognized by the DOM method `document.activeElement()`.
    * *keydown* - This standard event fires when a keyboard key is pressed and continues to fire multiple times if the key continues to be pressed.  The frequency of repeated event executions is defined by the machine operating system.
    * *keyup* - This standard event fires when a keyboard key that is pressed is then released.
-   * *move* - This event is custom to the test environment.  For security reasons the browser will not allow JavaScript to capture and direct the mouse cursor position, so this event allows for arbitrary movement of a DOM element for the convenience of testing.  This event uses a `coords` property in the given interaction object which is an array of two numbers that serve as coordinates for CSS properties *top* and *left* respectively in CSS *em* dimensions.
    * *mousedown* - This standard event executes when a mouse button is pressed on a given element.
    * *mouseenter* - This standard event executes when a mouse cursor enters the bounding area of a given element.
    * *mouseleave* - This standard event executes when a mouse cursor exits the bounding area of a given element.
    * *mousemove* - This standard event executes when a mouse cursor moves while remaining within the bounding area of the given element.
-   * *mouseover* - A standard event that is similar to the *mouseenter* event.  See this page for the distinction: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseover_event#example
    * *mouseout* - A standard event that is similar to the *mouseleave* event.  See this page for the distinction: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseout_event#examples
+   * *mouseover* - A standard event that is similar to the *mouseenter* event.  See this page for the distinction: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseover_event#example
    * *mouseup* - This standard event executes when a mouse button that is pressed is released.
+   * *move* - This event is custom to the test environment.  For security reasons the browser will not allow JavaScript to capture and direct the mouse cursor position, so this event allows for arbitrary movement of a DOM element for the convenience of testing.  This event uses a `coords` property in the given interaction object which is an array of two numbers that serve as coordinates for CSS properties *top* and *left* respectively in CSS *em* dimensions.
    * *pageAddress* - Allows for input into the browser's address bar.  The event requires use of the *value* property in its interaction object.
    * *refresh* - A custom event for this test environment that forces a page refresh and allows testing immediately upon the page becoming ready for evaluation.  A test with this event must have only one interaction.
    * *refresh-interaction* - A custom event for this test environment that executes an event which causes the page to refresh, such as *location.reload()* executing in the page in response to a user interaction, and evaluates the page once it is ready for evaluation.
