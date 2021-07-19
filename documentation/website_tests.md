@@ -309,6 +309,7 @@ An example test:
    * *mouseover* - A standard event that is similar to the *mouseenter* event.  See this page for the distinction: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseover_event#example
    * *mouseout* - A standard event that is similar to the *mouseleave* event.  See this page for the distinction: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseout_event#examples
    * *mouseup* - This standard event executes when a mouse button that is pressed is released.
+   * *pageAddress* - Allows for input into the browser's address bar.  The event requires use of the *value* property in its interaction object.
    * *refresh* - A custom event for this test environment that forces a page refresh and allows testing immediately upon the page becoming ready for evaluation.  A test with this event must have only one interaction.
    * *refresh-interaction* - A custom event for this test environment that executes an event which causes the page to refresh, such as *location.reload()* executing in the page in response to a user interaction, and evaluates the page once it is ready for evaluation.
    * *resize* - Resize either the browser window or a DOM element. This event uses a `coords` property to specify the width and height. To resize the browser window the node array must contain 1 item whose first index must be `window`.  Resize uses pixels as the dimension when applied to the browser window and CSS *em* dimensions when applied to a CSS element.

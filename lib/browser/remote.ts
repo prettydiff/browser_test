@@ -334,14 +334,25 @@ window.drialRemote = {
                     delay:number;
                 do {
                     config = item.test.interaction[index];
+                    if (config.event === "pageAddress") {
+                        if (typeof config.value !== "string") {
+                            window.drialRemote.send([
+                                [false, `event pageAddress requires a value property`, null]
+                            ], item.index, item.action);
+                            return;
+                        }
+                        location.href = config.value;
+                        return;
+                    }
                     if (config.event === "refresh") {
                         if (index === 0) {
                             location.reload();
                         } else {
                             window.drialRemote.error("The event 'refresh' was provided not as the first event of a test", "", 0, 0, null);
-                            return;
                         }
-                    } else if (config.event === "wait") {
+                        return;
+                    }
+                    if (config.event === "wait") {
                         delay = (isNaN(Number(config.value)) === true)
                             ? 0
                             : Number(config.value);
@@ -354,7 +365,8 @@ window.drialRemote = {
                             }
                         }, delay);
                         return;
-                    } else if (config.event === "resize" && config.node[0][0] === "window") {
+                    }
+                    if (config.event === "resize" && config.node[0][0] === "window") {
                         if (config.coords === undefined || config.coords === null || config.coords.length !== 2 || isNaN(Number(config.coords[0])) === true || isNaN(Number(config.coords[0])) === true) {
                             window.drialRemote.send([
                                 [false, `event error ${String(element)}`, config.node.nodeString]

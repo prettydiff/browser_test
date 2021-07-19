@@ -196,6 +196,9 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
                 failure.push(`     ${vars.text.green}Actual value:${vars.text.none}\n${vars.text.cyan + result[1][1].replace(/^"/, "").replace(/"$/, "").replace(/\\"/g, "\"") + vars.text.none}`);
             }
             falseFlag = true;
+        } else if (result[0][0] === false && result[0][1].indexOf("event pageAddress requires") === 0) {
+            failure.push(`${vars.text.angry + result[0][1] + vars.text.none}`);
+            falseFlag = true;
         } else if (result[0][0] === false && result[0][1].indexOf("event error ") === 0) {
             failure.push(`${vars.text.angry}Failed: event node is ${result[0][1].replace("event error ", "")}`);
             failure.push(`     Specified event node is: ${vars.text.cyan + result[0][2] + vars.text.none}`);

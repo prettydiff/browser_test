@@ -137,6 +137,30 @@ const demo:campaign = {
             ],
             name: "Close the modal",
             unit: []
+        },
+
+        // manually change the page address
+        {
+            delay: {
+                node: [
+                    ["getElementsByTagName", "body", 0],
+                    ["getElementsByTagName", "font", 0],
+                    ["getElementsByTagName", "a", 0]
+                ],
+                qualifier: "is",
+                target: ["innerHTML"],
+                type: "property",
+                value: "Privacy Policy"
+            },
+            interaction: [
+                {
+                    event: "pageAddress",
+                    node: [],
+                    value: "https://www.spacejam.com/1996/"
+                }
+            ],
+            name: "Manually change the page address",
+            unit: []
         }
     ]
 };

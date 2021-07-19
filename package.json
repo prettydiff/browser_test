@@ -18,15 +18,10 @@
         "test": "./lib/terminal/test"
     },
     "keywords": [
-        "file",
-        "system",
-        "file system",
-        "share",
-        "peer to peer",
-        "gui",
-        "explorer",
-        "private",
-        "privacy"
+        "test automation",
+        "browser",
+        "portable",
+        "remote"
     ],
     "license": "AGPL-3.0-only",
     "main": "js/lib/application.js",
