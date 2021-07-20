@@ -18,13 +18,17 @@ A list of problems attributed to the Chrome browser.
 * Setting the flag `--auto-open-devtools-for-tabs` causes the browser to error when a page address is specified via CDP.  This appears to be a Chrome developer tools defect after reading the Chromium project source code at the indicated location
   - Error message: `[16280:17676:0718/142416.732:ERROR:devtools_ui_bindings.cc(1651)] Attempt to navigate to an invalid DevTools front-end URL: https://www.bankofamerica.com/`
   - Defect report: https://bugs.chromium.org/p/chromium/issues/detail?id=1230398
+* Cannot create tabs.  When manually clicking on a hyperlink that contains a `target="_blank"` attribute using a mouse a new page tab is created with contain from the requested hyperlink location.  This is the desired behavior.  When you perform the same behavior using `event.initEvent` and `element.dispatchEvent` methods CDP reports the `Page.windowOpen` behavior.  HTTP requests to `/json/list` also report the new page at the desired location.  Despite that messaging from the browser no new tab is created in the chrome of the browser.  It does not exist, there is nothing to interact with, and the devtools running in the browser sees no new tab and reports no additional network traffic.
+  - Defect report: https://bugs.chromium.org/p/chromium/issues/detail?id=1231082
 
 ## Firefox
 A list of problems attributed to the Firefox browser.
 
 * Launching the browser with port 0 is permitted.  The behavior is the same as Chrome and Node.js in that the application will listen on a randomly available TCP port, but nobody knows how to identify what that port number is, including Firefox developers.
   - Work around: a post must always be specified when using Firefox.
+  - Defect report: https://bugzilla.mozilla.org/show_bug.cgi?id=1721371
 * Sometimes Firefox employs behaviors that cause a domain to auto-redirect to https.  If this happens to `localhost` the browser is dead to testing.  The browser is only listening on http scheme, but all traffic to localhost at the specified Firefox port becomes a HTTPS request, which will always time out.  When this happens it applies to requests in the browser, devtools, and the shell.  These are things I have tried:
   - Forget the domain from browsing history
   - In `about:config` set these keys to false: browser.urlbar.autoFill, browser.fixup.fallback-to-https, network.stricttransportsecurity.preloadlist
   - Investigated in a private browsing window
+  - Defect already reported: https://bugzilla.mozilla.org/show_bug.cgi?id=1679249
