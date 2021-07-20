@@ -3,6 +3,7 @@
 
 import error from "../utilities/error.js";
 import listener from "./listener.js";
+import log from "../utilities/log.js";
 import server from "./server.js";
 import vars from "../utilities/vars.js";
 
@@ -36,6 +37,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                                 vars.node.fs.readFile(filePath, function terminal_websites_openBrowser_delayStart_chromePort(fileError:Error, fileData:Buffer):void {
                                     if (fileError === null) {
                                         options.port = Number(fileData.toString().split("\n")[0]);
+                                        log([`Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`]);
                                         server.listen({
                                             port: 0
                                         }, listenWrapper);
@@ -45,6 +47,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                                 });
                             }
                         } else {
+                            log([`Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`]);
                             server.listen({
                                 port: 0
                             }, listenWrapper);

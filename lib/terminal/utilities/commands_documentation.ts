@@ -274,7 +274,12 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                 {
                     code: `${command}websites campaign:demo noClose`,
                     defined: "The default behavior is to terminate the application and close the browser upon test completion. The optional 'noClose' argument keeps everything open and alive for debugging and experimentation purposes."
-                }//,
+                },
+                {
+                    code: `${command}websites campaign:demo browserMessaging`,
+                    defined: "The argument prints all messaging from the browser to the terminal, except network traffic.  It also sets the option 'noClose' to true."
+                }
+                //,
                 //{
                 //    code: `${command}websites campaign:demo devtools`,
                 //    defined: "The 'devtools' optional parameter ensures the browser opens with devtools visible and available."

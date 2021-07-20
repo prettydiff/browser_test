@@ -46,6 +46,7 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[../lib/terminal/websites/listener.ts](../lib/terminal/websites/listener.ts)**                               - A service listener that processes input and output to the web browser.
    - **[../lib/terminal/websites/message.ts](../lib/terminal/websites/message.ts)**                                 - Message input/output to the browser via Chrome Developer Tools Protocol (CDP).
    - **[../lib/terminal/websites/openBrowser.ts](../lib/terminal/websites/openBrowser.ts)**                         - Launches the web browser with all necessary configurations in place.
+   - **[../lib/terminal/websites/requestTargetList.ts](../lib/terminal/websites/requestTargetList.ts)**             - Get a list of pages from the browser.
    - **[../lib/terminal/websites/results.ts](../lib/terminal/websites/results.ts)**                                 - Processes test result data into output for humans to read.
    - **[../lib/terminal/websites/server.ts](../lib/terminal/websites/server.ts)**                                   - A simple HTTP server to keep the application open listening for browser output.
 * Directory *[../lib/typescript](../lib/typescript)*

@@ -345,7 +345,7 @@ window.drialRemote = {
                     if (config.event === "pageAddress") {
                         if (typeof config.value !== "string") {
                             window.drialRemote.send([
-                                [false, `event pageAddress requires a value property`, null]
+                                [false, "event pageAddress requires a value property", null]
                             ], item.index, item.action);
                             return;
                         }

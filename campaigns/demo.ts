@@ -169,6 +169,56 @@ const demo:campaign = {
             ],
             name: "Go forward",
             unit: []
+        },
+
+        // go back again
+        {
+            delay: {
+                node: [
+                    ["getElementsByClassName", "accounts__card__middle", 2],
+                    ["getElementsByTagName", "p", 0]
+                ],
+                qualifier: "is",
+                target: ["innerHTML"],
+                type: "property",
+                value: "$100 opening deposit"
+            },
+            interaction: [
+                {
+                    event: "historyBack",
+                    node: []
+                }
+            ],
+            name: "Go back again",
+            unit: []
+        },
+
+        // click learn more Preferred Rewards to open a new tab
+        {
+            delay: {
+                node: [
+                    ["getElementsByTagName", "body", 0]
+                ],
+                qualifier: "is",
+                target: ["offsetTop"],
+                type: "property",
+                value: 900
+            },
+            interaction: [
+                {
+                    event: "wait",
+                    node: [],
+                    value: "2000"
+                },
+                {
+                    event: "click",
+                    node: [
+                        ["getElementById", "SecondaryCTAs_S1_cta1_LearnMore", null]
+                    ]
+                }
+            ],
+            name: "Click learn more Preferred Rewards to open a new tab",
+            unit: []
         }
     ]
 };

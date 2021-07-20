@@ -1,7 +1,9 @@
 
 /* lib/terminal/websites/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
 
+import requestTargetList from "./requestTargetList.js";
 import error from "../utilities/error.js";
+import log from "../utilities/log.js";
 import results from "./results.js";
 import vars from "../utilities/vars.js";
 
@@ -13,19 +15,48 @@ let id:number = 0,
     testIndex:number = 0,
     tests:testBrowserItem[] = null,
     finished:boolean = false;
-const message = function terminal_websites_message(config:browserMessageConfig):void {
+const targets:targetList = {},
+    message = function terminal_websites_message(config:browserMessageConfig):void {
         let loaderId:string = "",
             remote:string = "";
-        // eslint-disable-next-line
-        const list:any = JSON.parse(config.responseBody),
+        const populateTargets = function terminal_websites_message_populateTargets(listString:string):void {
+                const list:targetListItem[] = JSON.parse(listString),
+                    listLength:number = list.length;
+                let a:number = 0,
+                    b:number = 0,
+                    insert:boolean = true;
+                do {
+                    if (targets[list[a].type] === undefined) {
+                        targets[list[a].type] = [];
+                    }
+                    b = targets[list[a].type].length;
+                    insert = true;
+                    if (b > 0) {
+                        do {
+                            b = b - 1;
+                            if (targets[list[a].type][b].id === list[a].id) {
+                                targets[list[a].type][b].url = list[a].url;
+                                insert = false;
+                                break;
+                            }
+                        } while (b > 0);
+                    }
+                    if (insert === true) {
+                        targets[list[a].type].push(list[a]);
+                    }
+                    a = a + 1;
+                } while (a < listLength);
+            },
             sendRemote = function terminal_websites_message_sendRemote():void {
                 message.send("Page.addScriptToEvaluateOnNewDocument", {
                     source: remote
                 });
             };
+        // populate targets from initial page request
+        populateTargets(config.responseBody);
         tests = config.campaign.tests;
         // create a web socket client
-        message.ws = new WebSocket(list[0].webSocketDebuggerUrl, {perMessageDeflate: false});
+        message.ws = new WebSocket(targets.page[0].webSocketDebuggerUrl, {perMessageDeflate: false});
         message.ws.on("open", function terminal_websites_message_wsOpen():void {
             vars.node.fs.readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:string):void {
                 if (readError === null) {
@@ -37,7 +68,8 @@ const message = function terminal_websites_message(config:browserMessageConfig):
                     message.send("DOM.enable");
                     sendRemote();
                     message.send("Page.navigate", {
-                        url: config.campaign.startPage
+                        url: config.campaign.startPage,
+                        frameId: targets.page[0].id
                     });
                 } else {
                     error([readError.toString()]);
@@ -61,10 +93,15 @@ const message = function terminal_websites_message(config:browserMessageConfig):
                 const payload:any = JSON.parse(data);
                 frameId = payload.params.frameId;
                 loaderId = payload.params.loaderId;
-            }// else if (data.indexOf("{\"method\":\"Network.") !== 0) {
-            //    // print out all browser messaging except network traffic
-            //    console.log(data.slice(0, 250));
-            //}
+            } else if (config.options.browserMessaging === true && data.indexOf("{\"method\":\"Network.") !== 0) {
+                // print out all browser messaging except network traffic
+                log([data.slice(0, 250)]);
+            } else if (data.indexOf("{\"method\":\"Page.windowOpen\",") === 0) {
+                // update target list each time a new page window is opened
+                requestTargetList(function terminal_websites_message_wsMessage_browserList(listString:string):void {
+                    populateTargets(listString);
+                }, config.options.port);
+            }
         });
     };
 // every message to CDP must have a unique id

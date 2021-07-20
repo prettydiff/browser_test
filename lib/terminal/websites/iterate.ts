@@ -8,8 +8,6 @@ import vars from "../utilities/vars.js";
 
 const iterate = function terminal_websites_iterate(tests:testBrowserItem[], index:number, noClose:boolean):void {
     // not writing to settings
-    let delayMessage:string = "",
-        delayBrowser:boolean = false;
     const logs:string[] = [
             `Test ${index + 1} malformed: ${vars.text.angry + tests[index].name + vars.text.none}`,
             ""
@@ -28,14 +26,6 @@ const iterate = function terminal_websites_iterate(tests:testBrowserItem[], inde
                     }
                 }
             } while (a > 0);
-            value = 2000;
-            if (tests[index].interaction[0].event === "refresh" && count < value) {
-                delayMessage = "Providing remote machine browser time before a refresh.";
-                return value;
-            }
-            if (count > 0) {
-                delayBrowser = true;
-            }
             return count;
         }()),
         // determine if non-interactive events have required matching data properties
@@ -72,18 +62,14 @@ const iterate = function terminal_websites_iterate(tests:testBrowserItem[], inde
     if (validate() === true) {
         const prior:testBrowserEvent[] = tests[index - 1].interaction;
         if (index === 0 || (index > 0 && (prior === null || prior.length === 0 || prior[0].event !== "refresh"))) {
+            if (wait > 0) {
+                const second:number = (wait / 1000),
+                    plural:string = (second === 1)
+                        ? ""
+                        : "s";
+                log([`${humanTime(false)}Delaying for ${vars.text.cyan + second + vars.text.none} second${plural}: ${vars.text.cyan} Pausing for 'wait' event in browser. ${vars.text.none}`]);
+            }
             message.sendTest(index, false);
-        } else if (delayBrowser === true) {
-            const second:number = (wait / 1000),
-                plural:string = (second === 1)
-                    ? ""
-                    : "s",
-                waitText = function terminal_websites_iterate_waitText():string {
-                    return (delayMessage === "" && wait > 0)
-                        ? "Pausing for 'wait' event in browser."
-                        : delayMessage;
-                };
-            log([`${humanTime(false)}Delaying for ${vars.text.cyan + second + vars.text.none} second${plural}: ${vars.text.cyan + waitText() + vars.text.none}`]);
         }
     } else {
         vars.verbose = true;

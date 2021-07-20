@@ -22,6 +22,20 @@ declare global {
         responseBody: string;
         serverAddress: AddressInfo;
     }
+    interface targetList {
+        [key: string]: targetListItem[];
+    }
+    interface targetListItem {
+        description: string;
+        devtoolsFrontendUrl: string;
+        faviconUrl: string;
+        id: string;
+        parentId: string;
+        title: string;
+        type: "background_page" | "iframe" | "other" | "page";
+        url: string;
+        webSocketDebuggerUrl: string;
+    }
     // ------------------------------------
 
     // test application
@@ -97,6 +111,7 @@ declare global {
     // websites
     interface websitesInput {
         browser: string;
+        browserMessaging: boolean;
         campaignName: string;
         delay:number;
         devtools: boolean;

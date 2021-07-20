@@ -19,6 +19,7 @@ const test = function terminal_commands_test():void {
         },
         options:websitesInput = {
             browser: argv("browser"),
+            browserMessaging: (process.argv.indexOf("browserMessaging") > -1),
             campaignName: argv("campaign"),
             delay: (function browser_commands_test_delay():number {
                 const value:string = argv("delay"),
@@ -29,7 +30,7 @@ const test = function terminal_commands_test():void {
                 return 5000;
             }()),
             devtools: (process.argv.indexOf("devtools") > -1),
-            noClose: (process.argv.indexOf("noClose") > -1),
+            noClose: (process.argv.indexOf("browserMessaging") > -1 || process.argv.indexOf("noClose") > -1),
             port: (function terminal_commands_test_port():number {
                 const value:string = argv("port"),
                     numb:number = Number(value);
