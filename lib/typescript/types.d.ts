@@ -3,7 +3,7 @@
 type browser = "brave" | "chrome" | "edge" | "firefox" | "msedge" | "opera" | "vivaldi";
 type browserDOM = [domMethod, string, number];
 type buildPhase = "commands" | "configurations" | "libReadme" | "lint" | "typescript" | "version";
-type commands = "build" | "commands" | "directory" | "get" | "lint" | "mkdir" | "remove" | "update" | "version" | "websites";
+type commands = "build" | "commands" | "copy" | "directory" | "get" | "lint" | "mkdir" | "remove" | "update" | "version" | "websites";
 type directoryItem = [string,"directory" |  "error" | "file" | "link", string, number, number, directoryData];
 type directoryMode = "array" | "hash" | "list" | "read" | "search";
 type directoryResponse = directoryList | "missing" | "noShare" | "readOnly";

@@ -37,6 +37,7 @@ declare global {
     interface commandList {
         build: (test?:boolean, callback?:() => void) => void;
         commands: () => void;
+        copy: (params?:copyParams) => void;
         directory: (parameters?:readDirectory) => void;
         get: (address?:string, callback?:(file:Buffer|string) => void) => void;
         lint: (callback?:(complete:string, failCount:number) => void) => void;
@@ -61,6 +62,28 @@ declare global {
         browserLaunch: {
             [key:string]: string;
         };
+    }
+    // ------------------------------------
+
+    // copy
+    interface copyLog {
+        file: boolean;
+        link: boolean;
+        mkdir: boolean;
+    }
+    interface copyStats {
+        dirs: number;
+        error: number;
+        files: number;
+        link: number;
+        size: number;
+    }
+    interface copyParams {
+        callback: (output:[number, number, number]) => void;
+        destination: string;
+        exclusions: string[];
+        replace: boolean;
+        target: string;
     }
     // ------------------------------------
 

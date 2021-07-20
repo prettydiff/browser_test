@@ -2,6 +2,7 @@
 import { Stats } from "fs";
 
 import commands_documentation from "../utilities/commands_documentation.js";
+import copy from "./copy.js";
 import error from "../utilities/error.js";
 import directory from "./directory.js";
 import humanTime from "../utilities/humanTime.js";
@@ -683,12 +684,16 @@ const build = function terminal_commands_build(test:boolean, callback:() => void
                                             // write version data
                                             vars.node.fs.writeFile(`${vars.projectPath}version.json`, JSON.stringify(version), versionWrite);
                                         };
-                                    
+                                    vars.node.fs.stat(`${vars.projectPath}.git`, function terminal_commands_build_version_packStat_readPack_gitStat(gitError:Error):void {
+                                        if (gitError === null) {
+                                            vars.node.child("git rev-parse HEAD", {
+                                                cwd: vars.projectPath
+                                            }, commitHash);
+                                        } else {
+                                            commitHash(null, "", "");
+                                        }
+                                    });
                                     commandName = packageData.command;
-        
-                                    vars.node.child("git rev-parse HEAD", {
-                                        cwd: vars.projectPath
-                                    }, commitHash);
                                 },
                                 month:string = (function terminal_commands_build_version_packStat_month():string {
                                     let numb:number = stat.mtime.getMonth();

@@ -3,6 +3,7 @@
 
 import build from "../commands/build.js";
 import commands from "../commands/commands.js";
+import copy from "../commands/copy.js";
 import directory from "../commands/directory.js";
 import get from "../commands/get.js";
 import lint from "../commands/lint.js";
@@ -15,6 +16,7 @@ import websites from "../commands/websites.js";
 const commandList:commandList = {
     build: build,
     commands: commands,
+    copy: copy,
     directory: directory,
     get: get,
     lint: lint,

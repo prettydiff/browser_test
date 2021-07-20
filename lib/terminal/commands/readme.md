@@ -6,6 +6,7 @@ The terminal libraries that executable as either an included library or as a com
 
 * **[build.ts](build.ts)**         - The library that executes the build and test tasks.
 * **[commands.ts](commands.ts)**   - A command driven utility to list available commands and their respective documentation.
+* **[copy.ts](copy.ts)**           - A command driven utility to perform bit by bit file artifact copy.
 * **[directory.ts](directory.ts)** - A command driven utility to walk the file system and return a data structure.
 * **[get.ts](get.ts)**             - A command driven utility to fetch resources from across the internet via HTTP method GET.
 * **[lint.ts](lint.ts)**           - A command driven wrapper for executing external application ESLint.
