@@ -1,6 +1,6 @@
 
 /* lib/terminal/utilities/vars - Globally available variables for the terminal utility. */
-import { exec, spawn } from "child_process";
+import { exec, fork, spawn } from "child_process";
 
 import * as crypto from "crypto";
 import * as fs from "fs";
@@ -88,6 +88,7 @@ const vars:terminalVariables = {
     node: {
         child : exec,
         crypto: crypto,
+        fork  : fork,
         fs    : fs,
         http  : http,
         https : https,

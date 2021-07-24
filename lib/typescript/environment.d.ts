@@ -22,6 +22,8 @@ interface terminalVariables {
         // eslint-disable-next-line
         crypto: any;
         // eslint-disable-next-line
+        fork  : any;
+        // eslint-disable-next-line
         fs    : any;
         // eslint-disable-next-line
         http  : any;
