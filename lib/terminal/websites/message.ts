@@ -66,16 +66,13 @@ const targets:targetList = {},
                     remote = fileData.toString().replace(/serverPort:\s+\d+,/, `serverPort: ${config.serverAddress.port},`).replace("export {}", "");
                     message.send("Page.enable");
                     sendRemote();
-                    setTimeout(function () {
-                        message.send("Network.enable");
-                        message.send("Log.enable");
-                        message.send("Runtime.enable");
-                        message.send("DOM.enable");
-                        message.send("Page.reload", {
-                            ignoreCache: true
-                        });
-                        sendRemote();
-                    }, 1000);
+                    message.send("Network.enable");
+                    message.send("Log.enable");
+                    message.send("Runtime.enable");
+                    message.send("DOM.enable");
+                    message.send("Page.reload", {
+                        ignoreCache: true
+                    });
                 } else {
                     error([readError.toString()]);
                 }
