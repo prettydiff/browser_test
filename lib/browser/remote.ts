@@ -7,14 +7,6 @@ declare global {
     }
 }
 
-// start chrome --remote-debugging-port=9000 --no-first-run --no-default-browser-check
-// * --disable-web-security
-// start firefox -start-debugger-server 9000
-
-// chrome - https://chromedevtools.github.io/devtools-protocol/
-// firefox - https://embracethered.com/blog/posts/2020/cookies-on-firefox/
-// firefox - https://admx.help/?Category=FrontMotion&Policy=FrontMotion.Policies.Firefox::DEVTOOLS_DEBUGGER_PROMPT_CONNECTION
-
 window.drialRemote = {
 
     /* The action this module should take in response to test instructions from the terminal */

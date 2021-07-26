@@ -11,82 +11,82 @@ import vars from "../utilities/vars.js";
 
 const openBrowser = function terminal_websites_openBrowser(campaign:campaign, options:websitesInput, configuration:configuration):void {
     // this delay is necessary to launch the browser and allow it open before sending it commands
-    const keyword:"open"|"start"|"xdg-open" = (process.platform === "darwin")
-            ? "open"
-            : (process.platform === "win32")
-                ? "start"
-                : "xdg-open",
-        name:string = (options.browser === null)
-            ? campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
-            : options.browser.toLowerCase().replace(/^edge$/, "msedge"),
-        chromeLogs:string = `${vars.projectPath}lib${vars.sep}logs${vars.sep}chrome`,
-        firefoxLogs:string = `${vars.projectPath}lib${vars.sep}logs${vars.sep}firefox${vars.sep}log`,
-        chrome:boolean = (configuration.browserLaunch[name].indexOf("--user-data-dir=") === 0),filePath:string = (chrome === true)
-            ? `${chromeLogs + vars.sep}DevToolsActivePort`
-            : firefoxLogs,
+    options.browser = (options.browser === null)
+        ? campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
+        : options.browser.toLowerCase().replace(/^edge$/, "msedge");
+    const chrome:boolean = (configuration.browser.args[options.browser].indexOf("-vvv") < 0),
         timeout = function terminal_websites_openBrowser_timeout():void {
             const listenWrapper = function terminal_websites_openBrowser_timeout_listenWrapper():void {
                 listener(campaign, options, server);
             };
-            if (options.port === 0) {
-                // at this time I don't how to read a dynamic service port from Firefox
-                if (configuration.browserLaunch[name].indexOf("-MOZ_LOG") > -1) {
-                    error([
-                        `${vars.text.angry}An explicit port value must be provided for Firefox based browsers.${vars.text.none}`,
-                        `Example: ${vars.text.cyan}drial websites browser:firefox port:9000${vars.text.none}`,
-                        `For more guidance on the ${vars.text.green}websites${vars.text.none} command execute: ${vars.text.cyan}drial commands websites${vars.text.none}`
-                    ], 1);
-                } else {
-                    vars.node.fs.readFile(filePath, function terminal_websites_openBrowser_timeout_chromePort(fileError:Error, fileData:Buffer):void {
-                        if (fileError === null) {
-                            options.port = Number(fileData.toString().split("\n")[0]);
-                            log([`Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`]);
-                            server.listen({
-                                port: 0
-                            }, listenWrapper);
-                        } else {
-                            error([fileError.toString()], 1);
-                        }
-                    });
-                }
-            } else {
-                log([`Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`]);
-                server.listen({
-                    port: 0
-                }, listenWrapper);
-            }
+            log([`Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`]);
+            server.listen({
+                port: 0
+            }, listenWrapper);
         },
         // open a browser in the OS with its appropriate flags and port number
-        browserCommand = (function terminal_websites_openBrowser_chrome():string {
-            const base:string = (chrome === true)
-                ? (options.devtools === true)
-                    ? `--auto-open-devtools-for-tabs ${configuration.browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${chromeLogs}"`)}`
-                    : configuration.browserLaunch[name].replace("--user-data-dir=\"\"", `--user-data-dir="${chromeLogs}"`)
-                : (options.devtools === true)
-                    ? `--devtools ${configuration.browserLaunch[name].replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE "${firefoxLogs}" `)}`
-                    : configuration.browserLaunch[name].replace("-MOZ_LOG_FILE ", `-MOZ_LOG_FILE "${firefoxLogs}" `);
-            return `${keyword} ${name} ${base + options.port}`;
+        args = (function terminal_websites_openBrowser_chrome():string[] {
+            // unsupported browser
+            if (configuration.browser.args[options.browser] === undefined || configuration.browser.executable[options.browser] === undefined || configuration.browser.executable[options.browser] === "") {
+                error([
+                    `${vars.text.angry}Specified browser ${options.browser} is not supported.${vars.text.none}`,
+                    "",
+                    `${vars.text.underline}To add a new browser:${vars.text.none}`,
+                    `${vars.text.angry}*${vars.text.none} Update /lib/terminal/utilities/browser_launch.ts`,
+                    `${vars.text.angry}*${vars.text.none} Update /documentation/browsers.md`,
+                    `${vars.text.angry}*${vars.text.none} Submit a pull request to https://github.com/prettydiff/drial`,
+                ], 1);
+            }
+            configuration.browser.args[options.browser][configuration.browser.args[options.browser].indexOf("--remote-debugging-port=")] = `--remote-debugging-port=${options.port.toString()}`;
+            configuration.browser.args[options.browser].splice(0, 0, campaign.startPage);
+            if (chrome === true) {
+                if (options.devtools === true) {
+                    configuration.browser.args[options.browser].push("--auto-open-devtools-for-tabs");
+                }
+            } else {
+                if (options.devtools === true) {
+                    configuration.browser.args[options.browser].push("--devtools");
+                }
+            }
+            return configuration.browser.args[options.browser];
         }()),
-        spawn:ChildProcess = vars.node.spawn(browserCommand, [], {
-            shell: true,
-            stdio: "ignore"
+        spawn:ChildProcess = vars.node.spawn(`"${configuration.browser.executable[options.browser]}"`, args, {
+            cwd: vars.projectPath,
+            shell: true
         });
 
-    // unsupported browser
-    if (configuration.browserLaunch[name] === undefined) {
-        error([
-            `${vars.text.angry}Specified browser ${name} is not supported.${vars.text.none}`,
-            "",
-            `${vars.text.underline}To add a new browser:${vars.text.none}`,
-            `${vars.text.angry}*${vars.text.none} Update /lib/terminal/utilities/browser_launch.ts`,
-            `${vars.text.angry}*${vars.text.none} Update /documentation/browsers.md`,
-            `${vars.text.angry}*${vars.text.none} Submit a pull request to https://github.com/prettydiff/drial`,
-        ], 1);
-    }
-    spawn.on("data", function terminal_websites_openBrowser_spawnStdout(data:Buffer):void {
-        console.log("stdout");
-        console.log(data.toString());
+    spawn.stderr.on("data", function terminal_websites_openBrowser_spawnStderr(data:Buffer):void {
+        let str:string = data.toString();
+        if (str.indexOf("DevTools listening on ws") > -1) {
+            // grab the dynamic port for chrome type browsers
+            str = str.slice(str.indexOf(":") + 1);
+            str = str.slice(str.indexOf(":") + 1);
+            str = str.slice(0, str.indexOf("/"));
+            options.port = Number(str);
+        } else if (str.indexOf("Unable to move the cache: Access is denied.") > -1) {
+            // error about profile violations in chrome
+            error([
+                `${vars.text.angry}Browser profile conflict.${vars.text.none}`,
+                `Close all instances of browser ${vars.text.cyan + options.browser + vars.text.none} and try again.`
+            ], 1);
+        }
     });
+
+    spawn.stdout.on("data", function terminal_websites_openBrowser_spawnStdout(data:Buffer):void {
+        let str:string = data.toString();
+        if (str.indexOf("DBG-SERVER: Socket listening on: ") > -1) {
+            // grab the dynamic port for firefox type browsers
+            str = str.replace("DBG-SERVER:", "").replace(/\s+/g, "");
+            str = str.slice(str.indexOf(":") + 1);
+            options.port = Number(str);
+        } else if (str.indexOf("ERROR") > 0) {
+            error([
+                `${vars.text.angry}Error reported by browser ${options.browser} to stdout.${vars.text.none}`,
+                str
+            ], 1);
+        }
+    });
+
     setTimeout(timeout, options.delay);
 };
 

@@ -2,18 +2,52 @@
 
 // * browser name (object key) is a proper identifier used to launch the browser as a command
 // * command should be the full list of arguments associated with the given browser except port number
-const chrome:string = "--user-data-dir=\"\" --enable-logging --v=0 --no-first-run --no-default-browser-check --remote-debugging-port=",
-    firefox:string = "-MOZ_LOG_FILE -MOZ_LOG \"timestamp,rotate:200,nsSocketTransport:5\" -start-debugger-server ",
+const args:browserArgs = {
+        chrome: [
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--remote-debugging-port="
+        ],
+        firefox: [
+            "-vvv",
+            "--remote-debugging-port="
+        ]
+    },
     configuration:configuration = {
         // campaignLocation value must point to the compiled JS file location
         campaignLocation: "",
-        browserLaunch: {
-            brave  : chrome,
-            chrome : chrome,
-            firefox: firefox,
-            msedge : chrome,
-            opera  : chrome,
-            vivaldi: chrome,
+        browser: {
+            args: {
+                brave   : args.chrome,
+                chrome  : args.chrome,
+                chromium: args.chrome,
+                firefox : args.firefox,
+                msedge  : args.chrome,
+                opera   : args.chrome,
+                vivaldi : args.chrome,
+            },
+            // windows -- win32
+            // osx     -- darwin
+            // linux   -- linux
+            executable: {
+                brave   : "",
+                chrome  : (process.platform === "win32")
+                    ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+                    : "/snap/bin/chrome",
+                chromium: (process.platform === "win32")
+                    ? ""
+                    : "/snap/bin/chromium",
+                firefox : (process.platform === "win32")
+                    ? "C:\\Program Files\\Mozilla Firefox\\firefox.exe"
+                    : "/usr/bin/firefox",
+                msedge  : (process.platform === "win32")
+                    ? "C:\\Windows\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\msedge.exe"
+                    : "Macintosh HD/ Applications/ Microsoft Edge",
+                opera   : (process.platform === "win32")
+                    ? "C:\\Program Files\\Opera\\Launcher.exe"
+                    : "",
+                vivaldi : ""
+            }
         }
     };
 

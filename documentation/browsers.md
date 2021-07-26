@@ -19,28 +19,38 @@ The following documentation uses the `start` command to launch the application. 
 The actual documentation per browser.
 
 ### Chrome
-* **Execution** - `start chrome --enable-logging=stderr --v=1 --no-first-run --no-default-browser-check --remote-debugging-port=9000`
-   - Optionally the following flag can also be used to disable same origin policy: `--disable-web-security`
-   - Optionally open the browser with the developer tools already visible: `--auto-open-devtools-for-tabs`
+* **Execution** - `path_to_chrome --no-first-run --no-default-browser-check --remote-debugging-port=9000`
+  - Optionally the following flag can also be used to disable same origin policy: `--disable-web-security`
+  - Optionally open the browser with the developer tools already visible: `--auto-open-devtools-for-tabs`
 * **Documentation**
-   - Command line options - https://peter.sh/experiments/chromium-command-line-switches/
-   - Developer Tools Protocol - https://chromedevtools.github.io/devtools-protocol/
+  - Command line options - https://peter.sh/experiments/chromium-command-line-switches/
+  - Developer Tools Protocol - https://chromedevtools.github.io/devtools-protocol/
 * **Configuration** - none
 
 ### Firefox
-* **Execution** - `start firefox -start-debugger-server 9000`
-   - Optionally open the browser with the developer tools already visible: `--devtools`
+* **Execution** - `path_to_firefox --vvv --remote-debugging-server=9000`
+  - Optionally open the browser with the developer tools already visible: `--devtools`
 * **Documentation**
-   - Command line options - https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options?redirectlocale=en-US&redirectslug=Command_Line_Options
-   - More Command line options - https://www-archive.mozilla.org/quality/browser/front-end/testcases/cmd-line/
-   - Developer Tools Protocol - https://firefox-source-docs.mozilla.org/remote/index.html (additional to Chrome's Developer Tools Protocol, CDP)
-   - Logging modules - https://searchfox.org/mozilla-central/search?q=LazyLogModule.*%22&path=&case=false&regexp=true
+  - Command line options - http://kb.mozillazine.org/Command_line_arguments#:~:text=List%20of%20command%20line%20arguments%20%28incomplete%29%20%20,%20firefox.exe%20-safe-mode%20%2014%20more%20rows%20
+  - More Command line options - https://www.cyberciti.biz/faq/howto-run-firefox-from-the-command-line/
+  - Developer Tools Protocol - https://firefox-source-docs.mozilla.org/remote/index.html (additional to Chrome's Developer Tools Protocol, CDP)
+  - Browser Preparation for CDP - https://firefox-source-docs.mozilla.org/devtools/getting-started/development-profiles.html
+  - Logging modules - https://searchfox.org/mozilla-central/search?q=LazyLogModule.*%22&path=&case=false&regexp=true
 * **Configuration**
-   - In the browser go to page `about:config` and change these by searching for them and double clicking them:
-      * `browser.shell.checkDefaultBrowser` - value **false**
-      * `devtools.chrome.enable` - value **true**
-      * `devtools.debugger.prompt-connection` - value **false**
-      * `devtools.debugger.remote-enabled` - value **true**
+  - In the browser go to page `about:config` and change these by searching for them and double clicking them:
+
+    flag | value
+    ---|---
+    `browser.dom.window.dump.enabled`     | **true**
+    `browser.shell.checkDefaultBrowser`   | **false**
+    `devtools.chrome.enable`              | **true**
+    `devtools.console.stdout.chrome`      | **true**
+    `devtools.console.stdout.content`     | **true**
+    `devtools.debugger.log`               | **true**
+    `devtools.debugger.logging`           | **true**
+    `devtools.debugger.prompt-connection` | **false**
+    `devtools.debugger.remote-enabled`    | **true**
+    `devtools.dump.emit`                  | **true**
 
 ### Safari
 https://webkit.org/web-inspector/enabling-web-inspector/

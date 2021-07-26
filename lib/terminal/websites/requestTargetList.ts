@@ -6,10 +6,10 @@ import { ClientRequest, IncomingMessage, RequestOptions } from "http";
 import error from "../utilities/error.js";
 import vars from "../utilities/vars.js";
 
-const requestTargetList = function terminal_websites_requestTargetList(callback:(body:string) => void, port:number):void {
+const requestTargetList = function terminal_websites_requestTargetList(callback:(body:string) => void, port:number, browserName:string):void {
     const payload:RequestOptions = {
             headers: {
-                "content-type": "application/json"
+                "content-type": "text/plain"
             },
             host: "127.0.0.1",
             method: "GET",
@@ -34,8 +34,15 @@ const requestTargetList = function terminal_websites_requestTargetList(callback:
                 error([errorText.toString()]);
             });
         });
-    clientRequest.on("error", function terminal_websites_requestTargetList_requestError(errorText:Error):void {
-        error([errorText.toString()]);
+    clientRequest.on("error", function terminal_websites_requestTargetList_requestError(errorRequest:Error):void {
+        if (errorRequest.toString().indexOf("ECONNREFUSED") > 0) {
+            error([
+                `If any instances of ${vars.text.angry + browserName + vars.text.none} browser are open close them and try again.`,
+                errorRequest.toString()
+            ], 1);
+        } else {
+            error([errorRequest.toString()], 1);
+        }
     });
     clientRequest.write("");
     clientRequest.end();

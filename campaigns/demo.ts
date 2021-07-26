@@ -4,8 +4,6 @@ const demo:campaign = {
     // the initial page to load into the browser
     startPage: "https://promo.bankofamerica.com/advantage_banking/?cm_sp=DEP-Checking-_-NotAssigned-",
     browser: "chrome",
-    // an actual port value must be specified for Firefox type browsers as nobody knows how to find its dynamic port
-    // chrome based browsers can accept a port of 0 which will select a random available TCP port
     port: 0,
     tests: [
 
@@ -205,11 +203,6 @@ const demo:campaign = {
                 value: 900
             },
             interaction: [
-                {
-                    event: "wait",
-                    node: [],
-                    value: "2000"
-                },
                 {
                     event: "click",
                     node: [

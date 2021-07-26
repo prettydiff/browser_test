@@ -57,10 +57,18 @@ declare global {
     // ------------------------------------
 
     // configuration
+    interface browserArgs {
+        [key:string]: string[];
+    }
     interface configuration {
         campaignLocation: string;
-        browserLaunch: {
-            [key:string]: string;
+        browser: {
+            args: {
+                [key:string]: string[];
+            },
+            executable: {
+                [key:string]: string;
+            }
         };
     }
     // ------------------------------------

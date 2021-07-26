@@ -25,6 +25,7 @@ const targets:targetList = {},
                 let a:number = 0,
                     b:number = 0,
                     insert:boolean = true;
+                // loop through target object by target type
                 do {
                     if (targets[list[a].type] === undefined) {
                         targets[list[a].type] = [];
@@ -32,6 +33,7 @@ const targets:targetList = {},
                     b = targets[list[a].type].length;
                     insert = true;
                     if (b > 0) {
+                        // loop through a target type list
                         do {
                             b = b - 1;
                             if (targets[list[a].type][b].id === list[a].id) {
@@ -52,6 +54,7 @@ const targets:targetList = {},
                     source: remote
                 });
             };
+
         // populate targets from initial page request
         populateTargets(config.responseBody);
         tests = config.campaign.tests;
@@ -61,46 +64,52 @@ const targets:targetList = {},
             vars.node.fs.readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:string):void {
                 if (readError === null) {
                     remote = fileData.toString().replace(/serverPort:\s+\d+,/, `serverPort: ${config.serverAddress.port},`).replace("export {}", "");
-                    message.send("Network.enable");
-                    message.send("Log.enable");
-                    message.send("Runtime.enable");
                     message.send("Page.enable");
-                    message.send("DOM.enable");
                     sendRemote();
-                    message.send("Page.navigate", {
-                        url: config.campaign.startPage,
-                        frameId: targets.page[0].id
-                    });
+                    setTimeout(function () {
+                        message.send("Network.enable");
+                        message.send("Log.enable");
+                        message.send("Runtime.enable");
+                        message.send("DOM.enable");
+                        message.send("Page.reload", {
+                            ignoreCache: true
+                        });
+                        sendRemote();
+                    }, 1000);
                 } else {
                     error([readError.toString()]);
                 }
             });
         });
         message.ws.on("message", function terminal_websites_message_wsMessage(data:string):void {
-            if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0 && data.indexOf(loaderId) > 0) {
+            if (config.options.browserMessaging === true && data.indexOf("{\"method\":\"Network.") !== 0 && data.indexOf("DBG-SERVER:") !== 0 && data.indexOf("EMITTING:") !== 0) {
+                // print out all browser messaging except network traffic
+                log([data.slice(0, 250)]);
+            }
+            if (frameId === "" && data.indexOf("{\"method\":\"Page.frameStartedLoading\"") === 0) {
+                // get the frameId for the starting page
+                frameId = JSON.parse(data).params.frameId;
+            } else if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0) {
                 // inject code into next requested page
                 sendRemote();
-            } else if (data.indexOf("{\"method\":\"Page.frameStoppedLoading\"") === 0 && data.indexOf(frameId) > 0) {
-                // send a test
-                message.sendTest(testIndex, true);
             } else if (data.indexOf("{\"method\":\"Runtime.consoleAPICalled\"") === 0 && data.indexOf("Drial - report") > 0) {
                 // reading a test result from the browser
                 const result:testBrowserRoute = JSON.parse(JSON.parse(data).params.args[0].value.replace("Drial - report:", ""));
                 results(result, config.campaign.tests, config.options.noClose);
+            } else if (data.indexOf("{\"method\":\"Page.frameStoppedLoading\"") === 0 && data.indexOf(frameId) > 0) {
+                // send a test
+                message.sendTest(testIndex, true);console.log("send test");
             } else if (loaderId === "" && data.indexOf("{\"method\":\"Network.requestWillBeSent\"") === 0 && data.indexOf(config.campaign.startPage) > 0) {
                 // grab the session identifiers when the test starts
                 // eslint-disable-next-line
                 const payload:any = JSON.parse(data);
                 frameId = payload.params.frameId;
                 loaderId = payload.params.loaderId;
-            } else if (config.options.browserMessaging === true && data.indexOf("{\"method\":\"Network.") !== 0) {
-                // print out all browser messaging except network traffic
-                log([data.slice(0, 250)]);
             } else if (data.indexOf("{\"method\":\"Page.windowOpen\",") === 0) {
                 // update target list each time a new page window is opened
                 requestTargetList(function terminal_websites_message_wsMessage_browserList(listString:string):void {
                     populateTargets(listString);
-                }, config.options.port);
+                }, config.options.port, config.options.browser);
             }
         });
     };

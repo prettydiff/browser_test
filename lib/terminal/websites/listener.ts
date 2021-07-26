@@ -16,7 +16,7 @@ const listener = function terminal_websites_listener(campaign:campaign, options:
             responseBody: body.toString(),
             serverAddress: serverAddress
         });
-    }, options.port);
+    }, options.port, options.browser);
 };
 
 export default listener;
