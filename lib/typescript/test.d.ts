@@ -22,6 +22,12 @@ declare global {
         responseBody: string;
         serverAddress: AddressInfo;
     }
+    interface messageItem {
+        id: number;
+        method: string;
+        // eslint-disable-next-line
+        params?: any;
+    }
     interface targetList {
         [key: string]: targetListItem[];
     }
@@ -35,37 +41,6 @@ declare global {
         type: "background_page" | "iframe" | "other" | "page";
         url: string;
         webSocketDebuggerUrl: string;
-    }
-    // ------------------------------------
-
-    // test application
-    interface testComplete {
-        callback: Function;
-        fail: number;
-        testType: testListType | "selected";
-        total: number;
-    }
-    interface testEvaluation {
-        callback: Function;
-        fail: number;
-        index: number;
-        list: number[];
-        test: testItem;
-        testType: "service" | "simulation";
-        values: [string, string, string];
-    }
-    interface testExecute {
-        complete: Function;
-        fail: number;
-        index: number;
-        list: number[];
-    }
-    interface testItem {
-        artifact?: string;
-        command: string;
-        file?: string;
-        qualifier: qualifier | qualifierFile;
-        test: string;
     }
     // ------------------------------------
 
@@ -83,6 +58,7 @@ declare global {
         delay?: testBrowserTest;
         interaction: testBrowserEvent[];
         name: string;
+        page: number;
         unit: testBrowserTest[];
     }
     interface testBrowserRoute {
@@ -98,13 +74,6 @@ declare global {
         target: string[];
         type: "attribute" | "element" | "property";
         value: boolean | number | string | null;
-    }
-    // ------------------------------------
-
-    // test terminal command simulations
-    interface testSimulationApplication {
-        execute?: (config:testExecute) => void;
-        tests: testItem[];
     }
     // ------------------------------------
 

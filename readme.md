@@ -21,7 +21,31 @@ Much of this project's code is ripped straight from [Share File Systems](https:/
 1. `node js/application build` - build the application
 
 ## Run it
-
 * `drial websites campaign:demo`
 * For more options try the interactive command documentation `drial commands websites`.
 * See the [documentation](documenatation) for things like additional command guidance, browser research, known problems, how to write tests, and how this application works.
+
+## Getting started
+1. Execute `drial commands` to see commands available in the terminal and execute it with a command name for all supported options with examples: `drial commands websites`.
+2. Skim the [documentation](/documentation).
+
+## Configuration
+This application stores all configurations in the file `/lib/utilities/configuration.ts`.
+
+### Campaign path
+The application requires a campaign file to know which instructions to execute.  The default location for campaign files is `/campaigns` of this application.  To specify a different location open the configuration file and modify the value of `campaignPath` property with an absolute file system path.  Once complete rebuild with the command: `drial build`.
+
+### Browser path
+The default installation paths for several popular browsers per operating system are listed in the configuration file.
+
+* If your browser's default installation path for your operating system is absent please open a Github issue with the file system path and I will update the application.
+* If you are using a custom installation path and need to change the configuration file then make your change and run the command `drial build` to compile the code.
+
+## Campaign Files
+Please read the documentation files on client side tests: [/documentation/website_tests.md](/documentation/website_tests.md).
+
+## Timing
+Aside from the listed examples and test specified delays all test instructions attempt to execute as fast as the machine will allow.
+
+* The application starts with a 5 second delay to provide enough time for the browser to open before sending it test instructions.  This delay can be customized.  See `drial commands websites` for an example.
+* The application waits for a page to fully load before sending test instructions.  This is the factor that slows down this application the most.  If testing appears slow examine the performance of the page, such as if its waiting on third party scripts to request additional artifacts.

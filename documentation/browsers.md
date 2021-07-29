@@ -6,7 +6,7 @@
 ## Notes
 In the following documentation the port 9000 is used.  Any open port is acceptable, which is any unused port number from 1-65535.  A provided value of 0 means the application will randomly choose an available port.  Multiple browsers can be tested simultaneously, but they cannot share the same port numbers.
 
-Each browser that ships their own developer tools package provides their own proprietary protocol and documentation.  However most modern browsers appear to also support the Chrome Developer Tools Protocol (CDP) for remote access: https://chromedevtools.github.io/devtools-protocol/
+Each browser that ships their own developer tools package provides their own proprietary protocol and documentation.  However most modern browsers appear to also support the Chrome DevTools Protocol (CDP) for remote access: https://chromedevtools.github.io/devtools-protocol/
 
 ## Executing terminal applications
 The following documentation uses the `start` command to launch the application.  The command name per operating system is as follows:
@@ -19,7 +19,7 @@ The following documentation uses the `start` command to launch the application. 
 The actual documentation per browser.
 
 ### Chrome
-* **Execution** - `path_to_chrome --no-first-run --no-default-browser-check --remote-debugging-port=9000`
+* **Execution** - `path_to_chrome about:blank --no-first-run --no-default-browser-check --disable-popup-blocking --remote-debugging-port=9000`
   - Optionally the following flag can also be used to disable same origin policy: `--disable-web-security`
   - Optionally open the browser with the developer tools already visible: `--auto-open-devtools-for-tabs`
 * **Documentation**
@@ -28,7 +28,8 @@ The actual documentation per browser.
 * **Configuration** - none
 
 ### Firefox
-* **Execution** - `path_to_firefox --vvv --remote-debugging-server=9000`
+* **Support** - At this time **Firefox is not supported** and will error due to missing support for a feature required by this application.  That missing feature is *Page.addScriptToEvaluateOnNewDocument* of the CDP as described in [Firefox defect 1601695](https://bugzilla.mozilla.org/show_bug.cgi?id=1601695).  This application is otherwise written to provide full support for Firefox.
+* **Execution** - `path_to_firefox about:blank --vvv --remote-debugging-server=9000`
   - Optionally open the browser with the developer tools already visible: `--devtools`
 * **Documentation**
   - Command line options - http://kb.mozillazine.org/Command_line_arguments#:~:text=List%20of%20command%20line%20arguments%20%28incomplete%29%20%20,%20firefox.exe%20-safe-mode%20%2014%20more%20rows%20

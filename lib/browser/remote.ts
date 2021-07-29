@@ -110,7 +110,7 @@ window.drialRemote = {
                 // - An empty string, "all", or 0 means gather all descendant nodes regardless of type.
                 // - For standard values see: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
                 getNodesByType = function browser_dom_getNodesByType(typeValue:number|string):Node[] {
-                    const valueString:string = (typeof typeValue === "string") ? typeValue.toLowerCase() : "",
+                    const valueString:string = (typeof typeValue === "string") ? typeValue.toLowerCase().replace(/_node$/, "") : "",
                         // eslint-disable-next-line
                         root:Element = (this === document) ? document.documentElement : this,
                         numb:number = (isNaN(Number(typeValue)) === false)
@@ -124,29 +124,29 @@ window.drialRemote = {
                     // associate to the standard numeric type
                     if (valueString === "all" || typeValue === "") {
                         types = 0;
-                    } else if (valueString === "element_node") {
+                    } else if (valueString === "element") {
                         types = 1;
-                    } else if (valueString === "attribute_node") {
+                    } else if (valueString === "attribute") {
                         types = 2;
-                    } else if (valueString === "text_node") {
+                    } else if (valueString === "text") {
                         types = 3;
-                    } else if (valueString === "cdata_section_node") {
+                    } else if (valueString === "cdata_section") {
                         types = 4;
-                    } else if (valueString === "entity_reference_node") {
+                    } else if (valueString === "entity_reference") {
                         types = 5;
-                    } else if (valueString === "entity_node") {
+                    } else if (valueString === "entity") {
                         types = 6;
-                    } else if (valueString === "processing_instruction_node") {
+                    } else if (valueString === "processing_instruction") {
                         types = 7;
-                    } else if (valueString === "comment_node") {
+                    } else if (valueString === "comment") {
                         types = 8;
-                    } else if (valueString === "document_node") {
+                    } else if (valueString === "document") {
                         types = 9;
-                    } else if (valueString === "document_type_node") {
+                    } else if (valueString === "document_type") {
                         types = 10;
-                    } else if (valueString === "document_fragment_node") {
+                    } else if (valueString === "document_fragment") {
                         types = 11;
-                    } else if (valueString === "notation_node") {
+                    } else if (valueString === "notation") {
                         types = 12;
                     }
 

@@ -9,12 +9,15 @@ import vars from "../utilities/vars.js";
 const test = function terminal_commands_test():void {
     const argv = function browser_commands_test_argv(name:string):string|null {
             let a:number = process.argv.length;
-            do {
-                a = a - 1;
-                if (process.argv[a].indexOf(`${name}:`) === 0 && process.argv[a] !== `${name}:`) {
-                    return process.argv[a].slice(name.length + 1);
-                }
-            } while (a > 0);
+            name = name.replace(/s$/, "");
+            if (a > 0) {
+                do {
+                    a = a - 1;
+                    if (process.argv[a].indexOf(`${name}:`) === 0 && process.argv[a] !== `${name}:`) {
+                        return process.argv[a].slice(name.length + 1);
+                    }
+                } while (a > 0);
+            }
             return null;
         },
         options:websitesInput = {

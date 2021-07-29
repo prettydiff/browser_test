@@ -21,6 +21,7 @@ const demo:campaign = {
             },
             interaction: null,
             name: "Click into 'Open a checking account'",
+            page: 0,
             unit: [
                 {
                     node: [],
@@ -52,6 +53,7 @@ const demo:campaign = {
                 }
             ],
             name: "Evaluate a modal in the page",
+            page: 0,
             unit: [
                 {
                     node: [
@@ -97,6 +99,7 @@ const demo:campaign = {
                 }
             ],
             name: "Close the modal",
+            page: 0,
             unit: []
         },
 
@@ -121,6 +124,7 @@ const demo:campaign = {
                 }
             ],
             name: "Manually change the page address",
+            page: 0,
             unit: []
         },
 
@@ -143,6 +147,7 @@ const demo:campaign = {
                 }
             ],
             name: "Go back",
+            page: 0,
             unit: []
         },
 
@@ -166,6 +171,7 @@ const demo:campaign = {
                 }
             ],
             name: "Go forward",
+            page: 0,
             unit: []
         },
 
@@ -188,6 +194,7 @@ const demo:campaign = {
                 }
             ],
             name: "Go back again",
+            page: 0,
             unit: []
         },
 
@@ -195,12 +202,13 @@ const demo:campaign = {
         {
             delay: {
                 node: [
-                    ["getElementsByTagName", "body", 0]
+                    ["getElementById", "Footer_Logo", null],
+                    ["getNodesByType", "element", 0]
                 ],
                 qualifier: "is",
-                target: ["offsetTop"],
+                target: ["nodeName", "toLowerCase()"],
                 type: "property",
-                value: 900
+                value: "img"
             },
             interaction: [
                 {
@@ -211,7 +219,75 @@ const demo:campaign = {
                 }
             ],
             name: "Click learn more Preferred Rewards to open a new tab",
-            unit: []
+            page: 0,
+            unit: [
+                {
+                    node: [
+                        ["getElementById", "Footer_Logo", null],
+                        ["getNodesByType", "element", 0]
+                    ],
+                    qualifier: "is",
+                    target: ["alt"],
+                    type: "attribute",
+                    value: "Bank of America"
+                },
+                {
+                    node: [
+                        ["getElementById", "Footer_Logo", null],
+                        ["getNodesByType", "element", 0]
+                    ],
+                    qualifier: "is",
+                    target: ["src"],
+                    type: "attribute",
+                    value: "/global/assets/images/logo-bac-horiz-1.0.0.svg"
+                }
+            ]
+        },
+        {
+            delay: {
+                node: [
+                    ["getElementById", "tier1-tileNumber-3", null],
+                    ["nextSibling", null, null],
+                    ["getElementsByTagName", "h2", 0]
+                ],
+                qualifier: "greater",
+                target: ["clientHeight"],
+                type: "property",
+                value: 10
+            },
+            interaction: [
+                {
+                    event: "click",
+                    node: [
+                        ["getElementById", "tier1-tileNumber-1", null],
+                        ["getElementsByTagName", "a", 0]
+                    ]
+                }
+            ],
+            name: "Evaluate content in new bank tab, Preferred Rewards",
+            page: 1,
+            unit: [
+                {
+                    node: [
+                        ["getElementsByTagName", "h2", 3]
+                    ],
+                    qualifier: "is",
+                    target: ["innerHTML"],
+                    type: "property",
+                    value: "The best relationships grow over time"
+                },
+                {
+                    node: [
+                        ["getElementById", "tier1-tileNumber-3", null],
+                        ["nextSibling", null, null],
+                        ["getElementsByTagName", "h2", 0]
+                    ],
+                    qualifier: "is",
+                    target: ["firstChild", "textContent"],
+                    type: "property",
+                    value: "A rewards bonus on eligible Bank of America credit cards."
+                }
+            ]
         }
     ]
 };

@@ -16,6 +16,14 @@ let id:number = 0,
     tests:testBrowserItem[] = null,
     finished:boolean = false;
 const targets:targetList = {},
+    bringToFront = function terminal_websites_message_bringToFront():void {
+        if (message.ws !== null) {
+            message.send("Target.activateTarget", {
+                targetId: targets.page[tests[testIndex].page]
+            });
+            message.send("Page.bringToFront");
+        }
+    },
     message = function terminal_websites_message(config:browserMessageConfig):void {
         let loaderId:string = "",
             remote:string = "";
@@ -45,9 +53,19 @@ const targets:targetList = {},
                     }
                     if (insert === true) {
                         targets[list[a].type].push(list[a]);
+                        if (message.ws !== null) {
+                            message.send("Target.activateTarget", {
+                                targetId: list[a].id
+                            });
+                            sendRemote();
+                            message.send("Page.reload", {
+                                ignoreCache: false
+                            });
+                        }
                     }
                     a = a + 1;
                 } while (a < listLength);
+                bringToFront();
             },
             sendRemote = function terminal_websites_message_sendRemote():void {
                 message.send("Page.addScriptToEvaluateOnNewDocument", {
@@ -58,6 +76,7 @@ const targets:targetList = {},
         // populate targets from initial page request
         populateTargets(config.responseBody);
         tests = config.campaign.tests;
+
         // create a web socket client
         message.ws = new WebSocket(targets.page[0].webSocketDebuggerUrl, {perMessageDeflate: false});
         message.ws.on("open", function terminal_websites_message_wsOpen():void {
@@ -70,8 +89,9 @@ const targets:targetList = {},
                     message.send("Log.enable");
                     message.send("Runtime.enable");
                     message.send("DOM.enable");
-                    message.send("Page.reload", {
-                        ignoreCache: true
+                    message.send("Page.navigate", {
+                        transitionType: "address_bar",
+                        url: config.campaign.startPage
                     });
                 } else {
                     error([readError.toString()]);
@@ -79,34 +99,51 @@ const targets:targetList = {},
             });
         });
         message.ws.on("message", function terminal_websites_message_wsMessage(data:string):void {
+            // eslint-ignore-next-line
+            const parsed:any = JSON.parse(data),
+                method:string = parsed.method;
             if (config.options.browserMessaging === true && data.indexOf("{\"method\":\"Network.") !== 0 && data.indexOf("DBG-SERVER:") !== 0 && data.indexOf("EMITTING:") !== 0) {
                 // print out all browser messaging except network traffic
                 log([data.slice(0, 250)]);
             }
-            if (frameId === "" && data.indexOf("{\"method\":\"Page.frameStartedLoading\"") === 0) {
+            if (frameId === "" && method === "Page.frameStartedLoading") {
                 // get the frameId for the starting page
-                frameId = JSON.parse(data).params.frameId;
-            } else if (data.indexOf("{\"method\":\"Page.domContentEventFired\"") === 0) {
+                // this is a compatibility work around for Firefox
+                // see: https://bugzilla.mozilla.org/show_bug.cgi?id=1691501
+                frameId = parsed.params.frameId;
+            } else if (method === "Page.domContentEventFired") {
                 // inject code into next requested page
                 sendRemote();
-            } else if (data.indexOf("{\"method\":\"Runtime.consoleAPICalled\"") === 0 && data.indexOf("Drial - report") > 0) {
+            } else if (method === "Runtime.consoleAPICalled" && data.indexOf("Drial - report") > 0) {
                 // reading a test result from the browser
-                const result:testBrowserRoute = JSON.parse(JSON.parse(data).params.args[0].value.replace("Drial - report:", ""));
+                const result:testBrowserRoute = JSON.parse(parsed.params.args[0].value.replace("Drial - report:", ""));
                 results(result, config.campaign.tests, config.options.noClose);
-            } else if (data.indexOf("{\"method\":\"Page.frameStoppedLoading\"") === 0 && data.indexOf(frameId) > 0) {
+            } else if (method === "Page.frameStoppedLoading" && data.indexOf(frameId) > 0) {
                 // send a test
-                message.sendTest(testIndex, true);console.log("send test");
-            } else if (loaderId === "" && data.indexOf("{\"method\":\"Network.requestWillBeSent\"") === 0 && data.indexOf(config.campaign.startPage) > 0) {
+                message.sendTest(testIndex, true);
+            } else if (loaderId === "" && method === "Network.requestWillBeSent" && data.indexOf(config.campaign.startPage) > 0) {
                 // grab the session identifiers when the test starts
                 // eslint-disable-next-line
-                const payload:any = JSON.parse(data);
-                frameId = payload.params.frameId;
-                loaderId = payload.params.loaderId;
-            } else if (data.indexOf("{\"method\":\"Page.windowOpen\",") === 0) {
+                frameId = parsed.params.frameId;
+                loaderId = parsed.params.loaderId;
+            } else if (method === "Page.windowOpen") {
                 // update target list each time a new page window is opened
                 requestTargetList(function terminal_websites_message_wsMessage_browserList(listString:string):void {
                     populateTargets(listString);
                 }, config.options.port, config.options.browser);
+            } else if ((/\{"id":\d+,"result":\{"exceptionDetails":\{"text":"window.drialRemote is undefined"\}\}\}/).test(data) === true) {
+                // browser does not support the Page.addScriptToEvaluateOnNewDocument CDP method, so error
+                const errorMessage:string[] = [
+                    `Browser ${vars.text.angry + config.options.browser} is not supported${vars.text.none} by ${vars.text.cyan}drial${vars.text.none} due to missing a required feature:`,
+                    `${vars.text.cyan}Page.addScriptToEvaluateOnNewDocument${vars.text.none} of Chrome DevTools Protocol (CDP)`,
+                    "https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-addScriptToEvaluateOnNewDocument"
+                ];
+                if (config.options.browser === "firefox") {
+                    errorMessage.push("");
+                    errorMessage.push(`For firefox see defect ${vars.text.green + vars.text.bold}1601695${vars.text.none}, https://bugzilla.mozilla.org/show_bug.cgi?id=1601695`);
+                }
+                message.send("Browser.close");
+                error(errorMessage, 1);
             }
         });
     };
@@ -129,22 +166,32 @@ message.sendClose = function terminal_websites_message_sendClose(noClose:boolean
     }
 };
 message.sendTest = function terminal_websites_message_sendTest(index:number, refresh:boolean):void {
+    // send a test
     if (finished === false) {
-        // send a test
-        const route:testBrowserRoute = {
-            action: "result",
-            exit: null,
-            index: index,
-            result: null,
-            test: tests[index]
+        const sendWrapper = function terminal_websites_message_sendTest_sendWrapper():void {
+            // define the test package
+            const route:testBrowserRoute = {
+                action: "result",
+                exit: null,
+                index: index,
+                result: null,
+                test: tests[index]
+            };
+            if (refresh === true) {
+                // an interaction that triggers a page refresh must be set to null to avoid a loop
+                route.test.interaction = null;
+            }
+            // send the current test to the browser
+            testIndex = route.index;
+            message.send("Runtime.evaluate", {
+                expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`
+            });
         };
-        if (refresh === true) {
-            route.test.interaction = null;
+        if (index > 0 && tests[index].page !== tests[index - 1].page) {
+            // ensure a different page is active and visible
+            bringToFront();
         }
-        testIndex = route.index;
-        message.send("Runtime.evaluate", {
-            expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`
-        });
+        sendWrapper();
     }
 };
 message.ws = null;

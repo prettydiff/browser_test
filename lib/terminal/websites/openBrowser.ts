@@ -14,6 +14,23 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
     options.browser = (options.browser === null)
         ? campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
         : options.browser.toLowerCase().replace(/^edge$/, "msedge");
+    if (configuration.browser.executable[options.browser] === undefined) {
+        error([
+            `${vars.text.angry}Browser name ${options.browser} does not exist in the configuration.${vars.text.none}`,
+            `1. Please add ${vars.text.green + vars.text.bold + options.browser + vars.text.none} to the "execution" object of /lib/utilities/configuration.ts.`,
+            `2. Execute command: ${vars.text.cyan}drial build${vars.text.none}`,
+            `3. Run your test again.`
+        ], 1);
+    }
+    if (configuration.browser.executable[options.browser] === "") {
+        error([
+            `The ${vars.text.angry}execution path is not defined${vars.text.none} for browser ${vars.text.green + vars.text.bold + options.browser + vars.text.none}.`,
+            `1. Please find the file system path to browser ${options.browser} on your computer.`,
+            `2. Add that file system path to the "execution" object of /lib/utilities/configuration.ts`,
+            `3. Execute command: ${vars.text.cyan}drial build${vars.text.none}`,
+            `4. Run your test again.`
+        ], 1);
+    }
     const chrome:boolean = (configuration.browser.args[options.browser].indexOf("-vvv") < 0),
         timeout = function terminal_websites_openBrowser_timeout():void {
             const listenWrapper = function terminal_websites_openBrowser_timeout_listenWrapper():void {
@@ -38,7 +55,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                 ], 1);
             }
             configuration.browser.args[options.browser][configuration.browser.args[options.browser].indexOf("--remote-debugging-port=")] = `--remote-debugging-port=${options.port.toString()}`;
-            configuration.browser.args[options.browser].splice(0, 0, campaign.startPage);
+            configuration.browser.args[options.browser].splice(0, 0, "about:blank");
             if (chrome === true) {
                 if (options.devtools === true) {
                     configuration.browser.args[options.browser].push("--auto-open-devtools-for-tabs");

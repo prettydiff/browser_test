@@ -6,6 +6,7 @@ const args:browserArgs = {
         chrome: [
             "--no-first-run",
             "--no-default-browser-check",
+            "--disable-popup-blocking",
             "--remote-debugging-port="
         ],
         firefox: [

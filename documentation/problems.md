@@ -14,11 +14,7 @@ A list of problems or shortcomings identified to this application.
 ## Chrome
 A list of problems attributed to the Chrome browser.
 
-* Setting the flag `--auto-open-devtools-for-tabs` causes the browser to error when a page address is specified via CDP.  This appears to be a Chrome developer tools defect after reading the Chromium project source code at the indicated location
-  - Error message: `[16280:17676:0718/142416.732:ERROR:devtools_ui_bindings.cc(1651)] Attempt to navigate to an invalid DevTools front-end URL: https://www.bankofamerica.com/`
-  - Defect report: https://bugs.chromium.org/p/chromium/issues/detail?id=1230398
-* Cannot create tabs.  When manually clicking on a hyperlink that contains a `target="_blank"` attribute using a mouse a new page tab is created with contain from the requested hyperlink location.  This is the desired behavior.  When you perform the same behavior using `event.initEvent` and `element.dispatchEvent` methods CDP reports the `Page.windowOpen` behavior.  HTTP requests to `/json/list` also report the new page at the desired location.  Despite that messaging from the browser no new tab is created in the chrome of the browser.  It does not exist, there is nothing to interact with, and the devtools running in the browser sees no new tab and reports no additional network traffic.
-  - Defect report: https://bugs.chromium.org/p/chromium/issues/detail?id=1231082
-
 ## Firefox
 A list of problems attributed to the Firefox browser.
+
+* At this time **Firefox is not supported** and will error due to missing support for a feature required by this application.  That missing feature is *Page.addScriptToEvaluateOnNewDocument* of the CDP as described in [Firefox defect 1601695](https://bugzilla.mozilla.org/show_bug.cgi?id=1601695).  This application is otherwise written to provide full support for Firefox.
