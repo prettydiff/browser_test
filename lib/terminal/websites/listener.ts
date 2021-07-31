@@ -10,7 +10,7 @@ import message from "./message.js";
 const listener = function terminal_websites_listener(campaign:campaign, options:websitesInput, server:Server):void {
     requestTargetList(function terminal_websites_listener_callback(body:string):void {
         const serverAddress:AddressInfo = server.address() as AddressInfo;
-        message({
+        message.application({
             campaign: campaign,
             options: options,
             responseBody: body.toString(),

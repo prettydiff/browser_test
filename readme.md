@@ -47,5 +47,5 @@ Please read the documentation files on client side tests: [/documentation/websit
 ## Timing
 Aside from the listed examples and test specified delays all test instructions attempt to execute as fast as the machine will allow.
 
-* The application starts with a 5 second delay to provide enough time for the browser to open before sending it test instructions.  This delay can be customized.  See `drial commands websites` for an example.
+* The application starts with a 2 second delay to provide enough time for the browser to open before sending it test instructions.  This delay can be customized.  See `drial commands websites` for an example.
 * The application waits for a page to fully load before sending test instructions.  This is the factor that slows down this application the most.  If testing appears slow examine the performance of the page, such as if its waiting on third party scripts to request additional artifacts.

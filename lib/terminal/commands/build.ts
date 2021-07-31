@@ -2,7 +2,6 @@
 import { Stats } from "fs";
 
 import commands_documentation from "../utilities/commands_documentation.js";
-import copy from "./copy.js";
 import error from "../utilities/error.js";
 import directory from "./directory.js";
 import humanTime from "../utilities/humanTime.js";

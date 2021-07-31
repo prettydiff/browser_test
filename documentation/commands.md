@@ -171,7 +171,7 @@ Builds the application and then runs all the website related test commands
 1. `drial websites campaign:demo browser:firefox port:9000`
    - Optionally the port and/or browser can be specified. The browser and port are indicated in the test campaign, but these values will override the values indicated in the campaign file.
 1. `drial websites campaign:demo delay:2000`
-   - Optionally the delay can be specified with a value in milliseconds.  The default value is 5000 (5 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time.
+   - Optionally the delay can be specified with a value in milliseconds.  The default value is 2000 (2 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time.
 1. `drial websites campaign:demo noClose`
    - The default behavior is to terminate the application and close the browser upon test completion. The optional 'noClose' argument keeps everything open and alive for debugging and experimentation purposes.
 1. `drial websites campaign:demo browserMessaging`

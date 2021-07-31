@@ -65,10 +65,10 @@ declare global {
         browser: {
             args: {
                 [key:string]: string[];
-            },
+            };
             executable: {
                 [key:string]: string;
-            }
+            };
         };
     }
     // ------------------------------------

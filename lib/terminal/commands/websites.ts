@@ -30,7 +30,7 @@ const test = function terminal_commands_test():void {
                 if (value !== null && numb > 0) {
                     return numb;
                 }
-                return 5000;
+                return 2000;
             }()),
             devtools: (process.argv.indexOf("devtools") > -1),
             noClose: (process.argv.indexOf("browserMessaging") > -1 || process.argv.indexOf("noClose") > -1),

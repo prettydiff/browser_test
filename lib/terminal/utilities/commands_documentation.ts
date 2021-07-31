@@ -269,7 +269,7 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                 },
                 {
                     code: `${command}websites campaign:demo delay:2000`,
-                    defined: "Optionally the delay can be specified with a value in milliseconds.  The default value is 5000 (5 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time."
+                    defined: "Optionally the delay can be specified with a value in milliseconds.  The default value is 2000 (2 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time."
                 },
                 {
                     code: `${command}websites campaign:demo noClose`,

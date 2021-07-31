@@ -28,6 +28,20 @@ declare global {
         // eslint-disable-next-line
         params?: any;
     }
+    interface messageModule {
+        activePage: number;
+        application: (config:browserMessageConfig) => void;
+        indexMessage: number;
+        indexTest: number;
+        messageQueue: messageItem[];
+        send: () => void;
+        sendClose: (noClose:boolean, exitType:0|1) => void;
+        sendTest: (testIndex:number, refresh:boolean) => void;
+        // eslint-disable-next-line
+        sendToQueue: (method:string, params:any) => void;
+        switchPage: (pageIndex:number) => void;
+        targets: targetList;
+    }
     interface targetList {
         [key: string]: targetListItem[];
     }
@@ -41,6 +55,8 @@ declare global {
         type: "background_page" | "iframe" | "other" | "page";
         url: string;
         webSocketDebuggerUrl: string;
+        // eslint-disable-next-line
+        ws?: any;
     }
     // ------------------------------------
 
