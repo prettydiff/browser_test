@@ -39,7 +39,7 @@ declare global {
         sendTest: (testIndex:number, refresh:boolean) => void;
         // eslint-disable-next-line
         sendToQueue: (method:string, params:any) => void;
-        switchPage: (pageIndex:number) => void;
+        switchPage: (pageIndex:number, newPage:boolean) => void;
         targets: targetList;
     }
     interface targetList {
@@ -51,6 +51,7 @@ declare global {
         faviconUrl: string;
         id: string;
         parentId: string;
+        targetId?: string;
         title: string;
         type: "background_page" | "iframe" | "other" | "page";
         url: string;

@@ -1,7 +1,6 @@
 
 /* lib/terminal/websites/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
 
-import requestTargetList from "./requestTargetList.js";
 import error from "../utilities/error.js";
 import log from "../utilities/log.js";
 import results from "./results.js";
@@ -23,9 +22,8 @@ const message:messageModule = {
             opened:number = 0,
             openedTotal:number = 0;
         const currentPage:number = message.activePage,
-            populateTargets = function terminal_websites_message_application_populateTargets(listString:string):void {
-                const list:targetListItem[] = JSON.parse(listString),
-                    listLength:number = list.length;
+            populateTargets = function terminal_websites_message_application_populateTargets(list:targetListItem[], queueId:number):void {
+                const listLength:number = list.length;
                 let a:number = 0,
                     b:number = 0,
                     insert:boolean = true;
@@ -50,7 +48,12 @@ const message:messageModule = {
                     if (insert === true) {
                         message.targets[list[a].type].push(list[a]);
                         if (list[a].type === "page") {
-                            list[a].ws = new WebSocket(list[a].webSocketDebuggerUrl, {perMessageDeflate: false});
+                            let id:string = (list[a].id === undefined)
+                                ? list[a].targetId
+                                : list[a].id;
+                            list[a].id = id;
+                            list[a].ws = new WebSocket(`ws://127.0.0.1:${config.options.port}/devtools/page/${id}`, {perMessageDeflate: false});
+                            list[a].ws.pageId = message.targets.page.length - 1;
                             list[a].ws.on("message", wsMessage);
                             opened = opened + 1;
                             list[a].ws.on("open", wsOpen);
@@ -58,18 +61,45 @@ const message:messageModule = {
                     }
                     a = a + 1;
                 } while (a < listLength);
+                if (queueId > 0) {
+                    queue(queueId);
+                }
             },
             sendRemote = function terminal_websites_message_sendRemote():void {
                 message.sendToQueue("Page.addScriptToEvaluateOnNewDocument", {
                     source: remote
                 });
             },
+            queue = function terminal_websites_message_application_wsMessage_queue(id:number):void {
+                message.indexMessage = id + 1;
+                if (message.indexMessage === message.messageQueue.length) {
+                    sendMessage = true;
+                } else {
+                    sendMessage = false;
+
+//console.log(message.indexMessage+" "+message.messageQueue.length+" response");
+//console.log(message.messageQueue[message.indexMessage]);
+
+                    message.send();
+                }
+            },
             wsMessage = function terminal_websites_message_application_wsMessage(data:string):void {
-                // eslint-ignore-next-line
+                // eslint-disable-next-line
                 const parsed:any = JSON.parse(data),
                     method:string = parsed.method;
                 if ((/^\{"id":\d+,"result":\{/).test(data) === true) {
-                    if ((/\{"id":\d+,"result":\{"exceptionDetails":\{"text":"window.drialRemote is undefined"\}\}\}/).test(data) === true) {
+                    if (config.options.browserMessaging === true) {
+                        const item:messageItem = message.messageQueue[parsed.id];
+                        // print out all browser messaging except network traffic
+                        parsed.method = item.method;
+                        if (parsed.method === "Runtime.evaluate") {
+                            parsed.page = `${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`;
+                            parsed.testId = item.params.testId;
+                            parsed.testName = item.params.testName;
+                        }
+                        log([parsed]);
+                    }
+                    if (parsed.result.exceptionDetails !== undefined && parsed.result.exceptionDetails.text === "window.drialRemote is undefined") {
                         // browser does not support the Page.addScriptToEvaluateOnNewDocument CDP method, so error
                         const errorMessage:string[] = [
                             `Browser ${vars.text.angry + config.options.browser} is not supported${vars.text.none} by ${vars.text.cyan}drial${vars.text.none} due to missing a required feature:`,
@@ -82,19 +112,25 @@ const message:messageModule = {
                         }
                         message.sendToQueue("Browser.close", {});
                         error(errorMessage, 1);
+                    } else if (parsed.result.result !== undefined && parsed.result.result.description !== undefined && parsed.result.result.description.indexOf("TypeError: Cannot read property 'parse' of undefined\n") === 0) {
+                        // error - file remote not injected into page
+                        const item:messageItem = message.messageQueue[parsed.id],
+                            errorMessage:string[] = [
+                                `${vars.text.angry}Test failure.  Required file not injected into page:${vars.text.none}`,
+                                `Page index ${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`
+                            ];
+                        message.sendToQueue("Browser.close", {});
+                        error(errorMessage, 1);
                     } else {
-                        message.indexMessage = parsed.id + 1;
-                        if (message.indexMessage === message.messageQueue.length) {
-                            sendMessage = true;
+                        if (parsed.result.targetInfos !== undefined) {
+                            populateTargets(parsed.result.targetInfos, parsed.id);
                         } else {
-                            sendMessage = false;
-                            message.send();
+                            queue(parsed.id);
                         }
                     }
                 } else {
                     if (config.options.browserMessaging === true) {
-                        // print out all browser messaging except network traffic
-                        log([data.slice(0, 250)]);
+                        log([parsed]);
                     }
                     if (frameId === "" && method === "Page.frameStartedLoading") {
                         // get the frameId for the starting page
@@ -112,22 +148,20 @@ const message:messageModule = {
                         // send a test
                         message.sendTest(message.indexTest, true);
                     } else if (method === "Page.windowOpen") {
-                        // update target list each time a new page window is opened
-                        requestTargetList(function terminal_websites_message_wsMessage_browserList(listString:string):void {
-                            populateTargets(listString);
-                        }, config.options.port, config.options.browser);
+                        message.sendToQueue("Target.getTargets", {});
                     }
                 }
             },
             wsOpen = function terminal_websites_message_application_wsOpen():void {
-                message.switchPage(message.targets.page.length - 1);
+                // eslint-disable-next-line
+                message.switchPage(this.pageId, true);
                 sendRemote();
                 message.sendToQueue("Page.reload", {
                     ignoreCache: false
                 });
                 openedTotal = openedTotal + 1;
                 if (openedTotal === opened) {
-                    message.switchPage(currentPage);
+                    message.switchPage(currentPage, true);
                 }
             };
         
@@ -149,7 +183,7 @@ const message:messageModule = {
         });
 
         // populate targets from initial page request
-        populateTargets(config.responseBody);
+        populateTargets(JSON.parse(config.responseBody), 0);
         tests = config.campaign.tests;
     },
 
@@ -165,6 +199,9 @@ const message:messageModule = {
     // sends a given message to the browser
     send: function terminal_websites_message_send():void {
         message.targets.page[message.activePage].ws.send(JSON.stringify(message.messageQueue[message.indexMessage]));
+        if (message.messageQueue[message.indexMessage].method === "Page.addScriptToEvaluateOnNewDocument") {
+            message.messageQueue[message.indexMessage].params = {};
+        }
     },
 
     // close the browser when tests are complete
@@ -187,9 +224,9 @@ const message:messageModule = {
                 test: tests[index]
             };
             message.indexTest = index;
-            if (index > 0 && tests[index].page !== tests[index - 1].page) {
+            if (message.activePage !== tests[index].page) {
                 // ensure a different page is active and visible
-                message.switchPage(tests[index].page);
+                message.switchPage(tests[index].page, false);
             }
             if (refresh === true) {
                 // an interaction that triggers a page refresh must be set to null to avoid a loop
@@ -198,12 +235,15 @@ const message:messageModule = {
             // send the current test to the browser
             message.sendToQueue("Runtime.evaluate", {
                 executionContextId: message.targets.page[tests[index].page].id,
-                expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`
+                expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`,
+                testId: index,
+                testName: tests[index].name
             });
         }
     },
 
     // pushes uniform message data into the message queue
+    // eslint-disable-next-line
     sendToQueue: function terminal_websites_message_send(method:string, params?:any):void {
         message.messageQueue.push({
             id: message.messageQueue.length,
@@ -214,17 +254,22 @@ const message:messageModule = {
         });
         if (sendMessage === true && message.messageQueue.length > message.indexMessage) {
             sendMessage = false;
+
+//console.log(message.indexMessage+" "+message.messageQueue.length+" queue");
+
             message.send();
         }
     },
 
     // switch between pages of different tabs/windows
-    switchPage: function terminal_websites_message_switchPage(pageIndex:number):void {
+    switchPage: function terminal_websites_message_switchPage(pageIndex:number, newPage:boolean):void {
         message.activePage = pageIndex;
-        message.sendToQueue("Target.activateTarget", {
-            targetId: message.targets.page[pageIndex].id
-        });
-        message.sendToQueue("Page.bringToFront", {});
+        //message.sendToQueue("Target.activateTarget", {
+        //    targetId: message.targets.page[pageIndex].id
+        //});
+        if (newPage === false) {
+            message.sendToQueue("Page.bringToFront", {});
+        }
     },
     targets: {}
 };
