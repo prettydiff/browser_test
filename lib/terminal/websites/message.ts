@@ -76,10 +76,6 @@ const message:messageModule = {
                     sendMessage = true;
                 } else {
                     sendMessage = false;
-
-//console.log(message.indexMessage+" "+message.messageQueue.length+" response");
-//console.log(message.messageQueue[message.indexMessage]);
-
                     message.send();
                 }
             },
@@ -254,9 +250,6 @@ const message:messageModule = {
         });
         if (sendMessage === true && message.messageQueue.length > message.indexMessage) {
             sendMessage = false;
-
-//console.log(message.indexMessage+" "+message.messageQueue.length+" queue");
-
             message.send();
         }
     },
@@ -264,9 +257,6 @@ const message:messageModule = {
     // switch between pages of different tabs/windows
     switchPage: function terminal_websites_message_switchPage(pageIndex:number, newPage:boolean):void {
         message.activePage = pageIndex;
-        //message.sendToQueue("Target.activateTarget", {
-        //    targetId: message.targets.page[pageIndex].id
-        //});
         if (newPage === false) {
             message.sendToQueue("Page.bringToFront", {});
         }

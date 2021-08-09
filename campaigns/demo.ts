@@ -239,7 +239,9 @@ const demo:campaign = {
                     qualifier: "is",
                     target: ["src"],
                     type: "attribute",
+                    // cspell:disable
                     value: "/global/assets/images/logo-bac-horiz-1.0.0.svg"
+                    // cspell:enable
                 }
             ]
         },

@@ -25,8 +25,10 @@ Execute test automation in the browser using just JavaScript and without depende
 * [Code location](#code-location)
 * [Data structures](#data-structures)
    * [Data components, primary](#data-components-primary)
+   <!-- cspell:disable -->
    * [Data components, tests/delay and interaction](#data-components-testsdelay-and-interaction)
    * [Data components, tests/delay only](#data-components-testsdelay-only)
+   <!-- cspell:enable -->
    * [Data components, interaction only](#data-components-interaction-only)
 * [A note about Firefox](#a-note-about-firefox)
 * [Security considerations](#security-considerations)
