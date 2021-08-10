@@ -105,11 +105,11 @@ Use ESLint against all JavaScript files in a specified directory tree.
 1. `drial lint ../tools ignore [node_modules, .git, test, units]`
    - An ignore list is also accepted if there is a list wrapped in square braces following the word 'ignore'.
 
-## mkdir
+## makeDir
 Recursively creates a directory structure.  For example if 'my/new/path` were to be created but parent 'my' doesn't exist this command will create all three directories, but it will not alter or overwrite any artifacts already present. Relative paths are relative to the terminal's current working directory.
 
 ### Examples
-1. `drial mkdir my/path/to/create`
+1. `drial makeDir my/path/to/create`
    - This example would create directories as necessary to ensure the directory structure 'my/path/to/create' is available from the location relative to the terminal's current working directory.
 
 ## remove

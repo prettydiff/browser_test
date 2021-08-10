@@ -2,13 +2,13 @@
 /* lib/terminal/websites/server - A simple HTTP server to keep the application open listening for browser output. */
 
 import { Readable } from "stream";
-import { IncomingMessage, Server, ServerResponse } from "http";
+import { createServer, IncomingMessage, Server, ServerResponse } from "http";
 import { StringDecoder } from "string_decoder";
 
 import log from "../utilities/log.js";
 import vars from "../utilities/vars.js";
 
-const server:Server = vars.node.http.createServer(function terminal_websites_server(request:IncomingMessage, serverResponse:ServerResponse):void {
+const server:Server = createServer(function terminal_websites_server(request:IncomingMessage, serverResponse:ServerResponse):void {
     let body:string = "",
         ended:boolean = false;
     const decoder:StringDecoder = new StringDecoder("utf8"),
@@ -28,7 +28,7 @@ const server:Server = vars.node.http.createServer(function terminal_websites_ser
         // handler for a completed response to a request
         requestEnd = function terminal_websites_server_requestEnd():void {
             const message:string = `Response from terminal. Request body size: ${body.length}`,
-                readStream:Readable = vars.node.stream.Readable.from(message);
+                readStream:Readable = Readable.from(message);
             ended = true;
 
             serverResponse.setHeader("cache-control", "no-store");

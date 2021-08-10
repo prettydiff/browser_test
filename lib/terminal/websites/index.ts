@@ -1,6 +1,8 @@
 
 /* lib/terminal/websites/index - The code that allows testing of websites. */
 
+import { stat } from "fs";
+
 import configuration from "../utilities/configuration.js";
 import error from "../utilities/error.js";
 import openBrowser from "./openBrowser.js";
@@ -15,7 +17,7 @@ const websites = function terminal_websites_index(options:websitesInput):void {
         : configuration.campaignLocation.replace(/(\/|\\)$/, "");
 
     // read the campaign file
-    vars.node.fs.stat(`${configuration.campaignLocation + vars.sep + options.campaignName}.js`, function terminal_websites_index_campaign(err:Error):void {
+    stat(`${configuration.campaignLocation + vars.sep + options.campaignName}.js`, function terminal_websites_index_campaign(err:Error):void {
         if (err === null) {
             // @ts-ignore - this is working correct because es2020 is set in the tsconfig, but the ide doesn't see it
             import(`file:///${configuration.campaignLocation.replace(/\\/g, "/")}/${options.campaignName}.js`).then(function terminal_websites_index_campaign_promise(campaignData:campaignModule) {

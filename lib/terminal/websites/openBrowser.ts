@@ -1,7 +1,7 @@
 
 /* lib/terminal/websites/openBrowser - Launches the web browser with all necessary configurations in place. */
 
-import { ChildProcess } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 
 import error from "../utilities/error.js";
 import listener from "./listener.js";
@@ -67,12 +67,12 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             }
             return configuration.browser.args[options.browser];
         }()),
-        spawn:ChildProcess = vars.node.spawn(`"${configuration.browser.executable[options.browser]}"`, args, {
+        spawnItem:ChildProcess = spawn(`"${configuration.browser.executable[options.browser]}"`, args, {
             cwd: vars.projectPath,
             shell: true
         });
 
-    spawn.stderr.on("data", function terminal_websites_openBrowser_spawnStderr(data:Buffer):void {
+    spawnItem.stderr.on("data", function terminal_websites_openBrowser_spawnStderr(data:Buffer):void {
         let str:string = data.toString();
         if (str.indexOf("DevTools listening on ws") > -1) {
             // grab the dynamic port for chrome type browsers
@@ -89,7 +89,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
         }
     });
 
-    spawn.stdout.on("data", function terminal_websites_openBrowser_spawnStdout(data:Buffer):void {
+    spawnItem.stdout.on("data", function terminal_websites_openBrowser_spawnStdout(data:Buffer):void {
         let str:string = data.toString();
         if (str.indexOf("DBG-SERVER: Socket listening on: ") > -1) {
             // grab the dynamic port for firefox type browsers

@@ -1,5 +1,7 @@
 /* lib/application - The entry point to the application. */
 
+import { readFile, stat } from "fs";
+
 import commandName from "./lib/terminal/utilities/commandName.js";
 import commandList from "./lib/terminal/utilities/commandList.js";
 import commands_documentation from "./lib/terminal/utilities/commands_documentation.js";
@@ -21,9 +23,9 @@ import disallowed from "./lib/common/disallowed.js";
         },
         version:string = `${vars.projectPath}version.json`;
     disallowed(false);
-    vars.node.fs.stat(version, function terminal_init_version(erStat:Error):void {
+    stat(version, function terminal_init_version(erStat:Error):void {
         if (erStat === null) {
-            vars.node.fs.readFile(version, "utf8", function terminal_init_version_read(er:Error, versionFile:string):void {
+            readFile(version, "utf8", function terminal_init_version_read(er:Error, versionFile:string):void {
                 if (er === null) {
                     const data = JSON.parse(versionFile);
                     vars.date = data.date;

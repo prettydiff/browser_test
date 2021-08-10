@@ -1,7 +1,7 @@
 
 /* lib/terminal/websites/requestTargetList - Get a list of pages from the browser. */
 
-import { ClientRequest, IncomingMessage, RequestOptions } from "http";
+import { ClientRequest, IncomingMessage, request, RequestOptions } from "http";
 
 import error from "../utilities/error.js";
 import vars from "../utilities/vars.js";
@@ -18,7 +18,7 @@ const requestTargetList = function terminal_websites_requestTargetList(callback:
         },
         // issue a client request
         // the request must be http, not https, or this will fail since the browser are only listening on http
-        clientRequest:ClientRequest = vars.node.http.request(payload, function terminal_websites_requestTargetList_session(response:IncomingMessage):void {
+        clientRequest:ClientRequest = request(payload, function terminal_websites_requestTargetList_session(response:IncomingMessage):void {
             const chunks:Buffer[] = [];
             response.setEncoding("utf8");
             response.on("data", function terminal_websites_requestTargetList_session_chunk(chunk:Buffer):void {

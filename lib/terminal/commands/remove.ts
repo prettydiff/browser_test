@@ -1,5 +1,9 @@
 
 /* lib/terminal/commands/remove - A command driven utility to recursively remove file system artifacts. */
+
+import { rmdir, unlink } from "fs";
+import { resolve } from "path";
+
 import common from "../../common/common.js";
 import directory from "./directory.js";
 import error from "../utilities/error.js";
@@ -19,26 +23,31 @@ const remove = function terminal_commands_remove(filePath:string, callback:() =>
                 const len:number = fileList.length,
                     destroy = function terminal_commands_remove_removeItems_destroy(item:directoryItem):void {
                         const type:"rmdir"|"unlink" = (item[1] === "directory")
-                            ? "rmdir"
-                            : "unlink";
-                        vars.node.fs[type](item[0], function terminal_commands_remove_removeItems_destroy_callback(er:NodeJS.ErrnoException):void {
-                            if (vars.verbose === true && er !== null && er.toString().indexOf("no such file or directory") < 0) {
-                                if (er.code === "ENOTEMPTY") {
-                                    terminal_commands_remove_removeItems_destroy(item);
+                                ? "rmdir"
+                                : "unlink",
+                            destroyHandler = function terminal_commands_remove_removeItems_destroy_destroyHandler(er:NodeJS.ErrnoException):void {
+                                if (vars.verbose === true && er !== null && er.toString().indexOf("no such file or directory") < 0) {
+                                    if (er.code === "ENOTEMPTY") {
+                                        terminal_commands_remove_removeItems_destroy(item);
+                                        return;
+                                    }
+                                    error([er.toString()]);
                                     return;
                                 }
-                                error([er.toString()]);
-                                return;
-                            }
-                            if (item[0] === fileList[0][0]) {
-                                callback();
-                            } else {
-                                fileList[item[3]][4] = fileList[item[3]][4] - 1;
-                                if (fileList[item[3]][4] < 1) {
-                                    terminal_commands_remove_removeItems_destroy(fileList[item[3]]);
+                                if (item[0] === fileList[0][0]) {
+                                    callback();
+                                } else {
+                                    fileList[item[3]][4] = fileList[item[3]][4] - 1;
+                                    if (fileList[item[3]][4] < 1) {
+                                        terminal_commands_remove_removeItems_destroy(fileList[item[3]]);
+                                    }
                                 }
-                            }
-                        });
+                            };
+                        if (type === "rmdir") {
+                            rmdir(item[0], destroyHandler);
+                        } else {
+                            unlink(item[0], destroyHandler);
+                        }
                     };
                 if (fileList.length < 1) {
                     callback();
@@ -80,7 +89,7 @@ const remove = function terminal_commands_remove(filePath:string, callback:() =>
                 ]);
                 return;
             }
-            dirConfig.path = vars.node.path.resolve(process.argv[0]);
+            dirConfig.path = resolve(process.argv[0]);
             callback = function terminal_commands_remove_callback():void {
                 if (vars.verbose === true) {
                     const out:string[] = [`${vars.name} removed `];

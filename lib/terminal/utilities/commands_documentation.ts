@@ -108,19 +108,6 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                 }
             ]
         },
-        get: {
-            description: "Retrieve a resource via an absolute URI.",
-            example: [
-                {
-                    code: `${command}get http://example.com/file.txt`,
-                    defined: "Gets a resource from the web and prints the output to the shell."
-                },
-                {
-                    code: `${command}get http://example.com/file.txt path/to/file`,
-                    defined: "Get a resource from the web and writes the resource as UTF8 to a file at the specified path."
-                }
-            ]
-        },
         hash: {
             description: "Generate a SHA512 hash of a file or a string.",
             example: [
@@ -171,10 +158,10 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                 }
             ]
         },
-        mkdir: {
+        makeDir: {
             description: "Recursively creates a directory structure.  For example if 'my/new/path` were to be created but parent 'my' doesn't exist this command will create all three directories, but it will not alter or overwrite any artifacts already present. Relative paths are relative to the terminal's current working directory.",
             example: [{
-                code: `${command}mkdir my/path/to/create`,
+                code: `${command}makeDir my/path/to/create`,
                 defined: "This example would create directories as necessary to ensure the directory structure 'my/path/to/create' is available from the location relative to the terminal's current working directory."
             }]
         },
@@ -188,6 +175,19 @@ const commands_documentation = function terminal_utility_commandsDocumentation(c
                 {
                     code: `${command}remove "C:\\Program Files"`,
                     defined: "Quote the path if it contains non-alphanumeric characters."
+                }
+            ]
+        },
+        request: {
+            description: "Retrieve a resource via an absolute URI.",
+            example: [
+                {
+                    code: `${command}request http://example.com/file.txt`,
+                    defined: "Gets a resource from the web and prints the output to the shell."
+                },
+                {
+                    code: `${command}request http://example.com/file.txt path/to/file`,
+                    defined: "Get a resource from the web and writes the resource as UTF8 to a file at the specified path."
                 }
             ]
         },

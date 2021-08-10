@@ -5,10 +5,10 @@ import build from "../commands/build.js";
 import commands from "../commands/commands.js";
 import copy from "../commands/copy.js";
 import directory from "../commands/directory.js";
-import get from "../commands/get.js";
 import lint from "../commands/lint.js";
-import mkdir from "../commands/mkdir.js";
+import makeDir from "../commands/makeDir.js";
 import remove from "../commands/remove.js";
+import request from "../commands/request.js";
 import update from "../commands/update.js";
 import version from "../commands/version.js";
 import websites from "../commands/websites.js";
@@ -18,10 +18,10 @@ const commandList:commandList = {
     commands: commands,
     copy: copy,
     directory: directory,
-    get: get,
     lint: lint,
-    mkdir: mkdir,
+    makeDir: makeDir,
     remove: remove,
+    request: request,
     update: update,
     version: version,
     websites: websites

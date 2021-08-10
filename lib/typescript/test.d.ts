@@ -1,6 +1,7 @@
 /* lib/typescript/test.d - TypeScript interfaces used test automation. */
 
 import { AddressInfo } from "net";
+import { Protocol } from "devtools-protocol";
 
 declare global {
     // campaigns
@@ -22,11 +23,14 @@ declare global {
         responseBody: string;
         serverAddress: AddressInfo;
     }
+    interface extendedParameters {
+        testId?: number;
+        testName?: string;
+    }
     interface messageItem {
         id: number;
         method: string;
-        // eslint-disable-next-line
-        params?: any;
+        params: devtoolsParameters;
     }
     interface messageModule {
         activePage: number;
@@ -38,7 +42,7 @@ declare global {
         sendClose: (noClose:boolean, exitType:0|1) => void;
         sendTest: (testIndex:number, refresh:boolean) => void;
         // eslint-disable-next-line
-        sendToQueue: (method:string, params:any) => void;
+        sendToQueue: (method:string, params:devtoolsParameters) => void;
         switchPage: (pageIndex:number, newPage:boolean) => void;
         targets: targetList;
     }

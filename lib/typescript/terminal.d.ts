@@ -39,10 +39,10 @@ declare global {
         commands: () => void;
         copy: (params?:copyParams) => void;
         directory: (parameters?:readDirectory) => void;
-        get: (address?:string, callback?:(file:Buffer|string) => void) => void;
         lint: (callback?:(complete:string, failCount:number) => void) => void;
-        mkdir: (dirToMake?:string, callback?:(typeError:string) => void) => void;
+        makeDir: (dirToMake?:string, callback?:(typeError:string) => void) => void;
         remove: (filePath?:string, callback?:() => void) => void;
+        request: (address?:string, callback?:(file:Buffer|string) => void) => void;
         update:() => void;
         version: () => void;
         websites: () => void;
@@ -77,7 +77,7 @@ declare global {
     interface copyLog {
         file: boolean;
         link: boolean;
-        mkdir: boolean;
+        makeDir: boolean;
     }
     interface copyStats {
         dirs: number;

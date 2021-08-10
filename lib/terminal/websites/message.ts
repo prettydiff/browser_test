@@ -1,6 +1,8 @@
 
 /* lib/terminal/websites/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
 
+import { readFile } from "fs";
+
 import error from "../utilities/error.js";
 import log from "../utilities/log.js";
 import results from "./results.js";
@@ -162,7 +164,7 @@ const message:messageModule = {
             };
         
         // read the remote.js as a string for injection into a page
-        vars.node.fs.readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:string):void {
+        readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:Buffer):void {
             if (readError === null) {
                 remote = fileData.toString().replace(/serverPort:\s+\d+,/, `serverPort: ${config.serverAddress.port},`).replace("export {}", "");
                 message.sendToQueue("Page.enable", {});
@@ -230,7 +232,6 @@ const message:messageModule = {
             }
             // send the current test to the browser
             message.sendToQueue("Runtime.evaluate", {
-                executionContextId: message.targets.page[tests[index].page].id,
                 expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`,
                 testId: index,
                 testName: tests[index].name
