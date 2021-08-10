@@ -12,7 +12,6 @@ import vars from "../utilities/vars.js";
 import WebSocket from "../../ws-es6/index.js";
 
 let sendMessage:boolean = false,
-    frameId:string = "",
     tests:testBrowserItem[] = null,
     finished:boolean = false,
     now:number = Date.now();
@@ -29,19 +28,23 @@ const message:messageModule = {
                 const listLength:number = list.length;
                 let a:number = 0,
                     b:number = 0,
-                    insert:boolean = true;
+                    insert:boolean = true,
+                    id:string = "";
                 // loop through target object by target type
                 do {
                     if (message.targets[list[a].type] === undefined) {
                         message.targets[list[a].type] = [];
                     }
                     b = message.targets[list[a].type].length;
+                    id = (list[a].id === undefined)
+                        ? list[a].targetId
+                        : list[a].id;
                     insert = true;
                     if (b > 0) {
                         // loop through a target type list
                         do {
                             b = b - 1;
-                            if (message.targets[list[a].type][b].id === list[a].id) {
+                            if (message.targets[list[a].type][b].id === id) {
                                 message.targets[list[a].type][b].url = list[a].url;
                                 insert = false;
                                 break;
@@ -51,12 +54,10 @@ const message:messageModule = {
                     if (insert === true) {
                         message.targets[list[a].type].push(list[a]);
                         if (list[a].type === "page") {
-                            let id:string = (list[a].id === undefined)
-                                ? list[a].targetId
-                                : list[a].id;
                             list[a].id = id;
                             list[a].ws = new WebSocket(`ws://127.0.0.1:${config.options.port}/devtools/page/${id}`, {perMessageDeflate: false});
                             list[a].ws.pageId = message.targets.page.length - 1;
+                            list[a].ws.targetId = id;
                             list[a].ws.on("message", wsMessage);
                             opened = opened + 1;
                             list[a].ws.on("open", wsOpen);
@@ -139,12 +140,7 @@ const message:messageModule = {
                     const page:Protocol.Page.FrameStartedLoadingEvent = JSON.parse(data).params;
                     message.log.events.push(parsed);
                     message.log.summary.events.push(`${message.log.summary.events.length}, ${method}`);
-                    if (frameId === "" && method === "Page.frameStartedLoading") {
-                        // get the frameId for the starting page
-                        // this is a compatibility work around for Firefox
-                        // see: https://bugzilla.mozilla.org/show_bug.cgi?id=1691501
-                        frameId = page.frameId;
-                    } else if (method === "Page.domContentEventFired") {
+                    if (method === "Page.domContentEventFired") {
                         // inject code into next requested page
                         sendRemote();
                     } else if (method === "Runtime.consoleAPICalled" && data.indexOf("Drial - report") > 0) {
@@ -152,7 +148,7 @@ const message:messageModule = {
                         const consoleEvent:Protocol.Runtime.ConsoleAPICalledEvent = JSON.parse(data).params,
                             result:testBrowserRoute = JSON.parse(consoleEvent.args[0].value.replace("Drial - report:", ""));
                         results(result, config.campaign.tests, config.options.noClose);
-                    } else if (method === "Page.frameStoppedLoading" && data.indexOf(frameId) > 0) {
+                    } else if (method === "Page.frameStoppedLoading" && page.frameId === message.targets.page[message.activePage].id) {
                         // send a test
                         message.sendTest(message.indexTest, true);
                     } else if (method === "Page.windowOpen") {
@@ -162,14 +158,26 @@ const message:messageModule = {
             },
             wsOpen = function terminal_websites_message_application_wsOpen():void {
                 // eslint-disable-next-line
-                message.switchPage(this.pageId, true);
+                const pageId:number = this.pageId;
+                message.switchPage(pageId, true);
+                message.sendToQueue("Runtime.enable", {});
+                message.sendToQueue("Page.enable", {});
+
                 sendRemote();
-                message.sendToQueue("Page.reload", {
-                    ignoreCache: false
-                });
-                openedTotal = openedTotal + 1;
-                if (openedTotal === opened) {
-                    message.switchPage(currentPage, true);
+                if (message.targets.page.length === 1) {
+                    message.sendToQueue("Page.navigate", {
+                        transitionType: "address_bar",
+                        url: config.campaign.startPage
+                    });
+                    message.send();
+                } else {
+                    message.sendToQueue("Page.reload", {
+                        ignoreCache: false
+                    });
+                    openedTotal = openedTotal + 1;
+                    if (openedTotal === opened) {
+                        message.switchPage(currentPage, true);
+                    }
                 }
             },
             interval = setInterval(function terminal_websites_message_application_interval():void {
@@ -178,7 +186,7 @@ const message:messageModule = {
                     message.writeLog(function terminal_websites_message_application_interval_handler():void {
                         const hung:string[] = [
                             `${vars.text.angry}Application has hung for more than 10 seconds.${vars.text.none}`,
-                            "Logs written."
+                            "Logs written.\u0007"
                         ];
                         if (config.options.noClose === true) {
                             error(hung);
@@ -188,27 +196,20 @@ const message:messageModule = {
                     });
                 }
             }, 4000);
+
+        tests = config.campaign.tests;
         
         // read the remote.js as a string for injection into a page
         readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:Buffer):void {
             if (readError === null) {
                 remote = fileData.toString().replace(/serverPort:\s+\d+,/, `serverPort: ${config.serverAddress.port},`).replace("export {}", "");
-                message.sendToQueue("Page.enable", {});
-                sendRemote();
-                message.sendToQueue("Runtime.enable", {});
-                message.sendToQueue("Page.navigate", {
-                    transitionType: "address_bar",
-                    url: config.campaign.startPage
-                });
-                message.send();
+
+                // populate targets from initial page request
+                populateTargets(JSON.parse(config.responseBody), 0);
             } else {
                 error([readError.toString()], 1);
             }
         });
-
-        // populate targets from initial page request
-        populateTargets(JSON.parse(config.responseBody), 0);
-        tests = config.campaign.tests;
     },
 
     // index of the test list
