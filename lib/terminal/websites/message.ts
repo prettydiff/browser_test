@@ -120,11 +120,11 @@ const message:messageModule = {
                         message.sendToQueue("Browser.close", {});
                         error(errorMessage, 1);
                     } else {
-                        const targetInfos:targetListItem[] = JSON.parse(data).result;
-                        if (targetInfos !== undefined) {
-                            populateTargets(targetInfos, parsed.id);
-                        } else {
+                        const targets:Protocol.Target.GetTargetsResponse = JSON.parse(data).result;
+                        if (targets.targetInfos === undefined) {
                             queue(parsed.id);
+                        } else {
+                            populateTargets(targets.targetInfos as targetListItem[], parsed.id);
                         }
                     }
                 } else {
