@@ -2,6 +2,7 @@
 /* lib/terminal/websites/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
 
 import { readFile } from "fs";
+import { Protocol } from "devtools-protocol";
 
 import error from "../utilities/error.js";
 import log from "../utilities/log.js";
@@ -82,8 +83,8 @@ const message:messageModule = {
                 }
             },
             wsMessage = function terminal_websites_message_application_wsMessage(data:string):void {
-                // eslint-disable-next-line
-                const parsed:any = JSON.parse(data),
+                const parsed:devtoolsParameters = JSON.parse(data),
+                    runTime:Protocol.Runtime.EvaluateResponse = JSON.parse(data).result,
                     method:string = parsed.method;
                 if ((/^\{"id":\d+,"result":\{/).test(data) === true) {
                     if (config.options.browserMessaging === true) {
@@ -95,9 +96,8 @@ const message:messageModule = {
                             parsed.testId = item.params.testId;
                             parsed.testName = item.params.testName;
                         }
-                        log([parsed]);
                     }
-                    if (parsed.result.exceptionDetails !== undefined && parsed.result.exceptionDetails.text === "window.drialRemote is undefined") {
+                    if (runTime.exceptionDetails !== undefined && runTime.exceptionDetails.text === "window.drialRemote is undefined") {
                         // browser does not support the Page.addScriptToEvaluateOnNewDocument CDP method, so error
                         const errorMessage:string[] = [
                             `Browser ${vars.text.angry + config.options.browser} is not supported${vars.text.none} by ${vars.text.cyan}drial${vars.text.none} due to missing a required feature:`,
@@ -110,7 +110,7 @@ const message:messageModule = {
                         }
                         message.sendToQueue("Browser.close", {});
                         error(errorMessage, 1);
-                    } else if (parsed.result.result !== undefined && parsed.result.result.description !== undefined && parsed.result.result.description.indexOf("TypeError: Cannot read property 'parse' of undefined\n") === 0) {
+                    } else if (runTime.result !== undefined && runTime.result.description !== undefined && runTime.result.description.indexOf("TypeError: Cannot read property 'parse' of undefined\n") === 0) {
                         // error - file remote not injected into page
                         const item:messageItem = message.messageQueue[parsed.id],
                             errorMessage:string[] = [
@@ -120,27 +120,27 @@ const message:messageModule = {
                         message.sendToQueue("Browser.close", {});
                         error(errorMessage, 1);
                     } else {
-                        if (parsed.result.targetInfos !== undefined) {
-                            populateTargets(parsed.result.targetInfos, parsed.id);
+                        const targetInfos:targetListItem[] = JSON.parse(data).result;
+                        if (targetInfos !== undefined) {
+                            populateTargets(targetInfos, parsed.id);
                         } else {
                             queue(parsed.id);
                         }
                     }
                 } else {
-                    if (config.options.browserMessaging === true) {
-                        log([parsed]);
-                    }
+                    const page:Protocol.Page.FrameStartedLoadingEvent = JSON.parse(data).params;
                     if (frameId === "" && method === "Page.frameStartedLoading") {
                         // get the frameId for the starting page
                         // this is a compatibility work around for Firefox
                         // see: https://bugzilla.mozilla.org/show_bug.cgi?id=1691501
-                        frameId = parsed.params.frameId;
+                        frameId = page.frameId;
                     } else if (method === "Page.domContentEventFired") {
                         // inject code into next requested page
                         sendRemote();
                     } else if (method === "Runtime.consoleAPICalled" && data.indexOf("Drial - report") > 0) {
                         // reading a test result from the browser
-                        const result:testBrowserRoute = JSON.parse(parsed.params.args[0].value.replace("Drial - report:", ""));
+                        const consoleEvent:Protocol.Runtime.ConsoleAPICalledEvent = JSON.parse(data).params,
+                            result:testBrowserRoute = JSON.parse(consoleEvent.args[0].value.replace("Drial - report:", ""));
                         results(result, config.campaign.tests, config.options.noClose);
                     } else if (method === "Page.frameStoppedLoading" && data.indexOf(frameId) > 0) {
                         // send a test
@@ -241,7 +241,7 @@ const message:messageModule = {
 
     // pushes uniform message data into the message queue
     // eslint-disable-next-line
-    sendToQueue: function terminal_websites_message_send(method:string, params?:any):void {
+    sendToQueue: function terminal_websites_message_send(method:string, params:devtoolsParameters):void {
         message.messageQueue.push({
             id: message.messageQueue.length,
             method: method,

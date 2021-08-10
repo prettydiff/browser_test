@@ -66,15 +66,6 @@ Traverses a directory in the local file system and generates a list.  If a sourc
 1. `drial directory source:"my/directory/path" relative`
    - The relative argument provide relative paths from the source path instead of absolute paths.
 
-## get
-Retrieve a resource via an absolute URI.
-
-### Examples
-1. `drial get http://example.com/file.txt`
-   - Gets a resource from the web and prints the output to the shell.
-1. `drial get http://example.com/file.txt path/to/file`
-   - Get a resource from the web and writes the resource as UTF8 to a file at the specified path.
-
 ## hash
 Generate a SHA512 hash of a file or a string.
 
@@ -120,6 +111,15 @@ Remove a file or directory tree from the local file system.
    - Removes the specified resource.
 1. `drial remove "C:\Program Files"`
    - Quote the path if it contains non-alphanumeric characters.
+
+## request
+Retrieve a resource via an absolute URI.
+
+### Examples
+1. `drial request http://example.com/file.txt`
+   - Gets a resource from the web and prints the output to the shell.
+1. `drial request http://example.com/file.txt path/to/file`
+   - Get a resource from the web and writes the resource as UTF8 to a file at the specified path.
 
 ## service
 Launches a HTTP service and web sockets so that the web tool is automatically refreshed once code changes in the local file system.

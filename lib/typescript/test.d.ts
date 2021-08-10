@@ -24,6 +24,9 @@ declare global {
         serverAddress: AddressInfo;
     }
     interface extendedParameters {
+        id?: number;
+        method?: string;
+        page?: string;
         testId?: number;
         testName?: string;
     }
@@ -49,17 +52,8 @@ declare global {
     interface targetList {
         [key: string]: targetListItem[];
     }
-    interface targetListItem {
-        description: string;
-        devtoolsFrontendUrl: string;
-        faviconUrl: string;
+    interface targetListItem extends Protocol.Target.TargetInfo {
         id: string;
-        parentId: string;
-        targetId?: string;
-        title: string;
-        type: "background_page" | "iframe" | "other" | "page";
-        url: string;
-        webSocketDebuggerUrl: string;
         // eslint-disable-next-line
         ws?: any;
     }
