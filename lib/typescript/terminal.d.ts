@@ -56,11 +56,11 @@ declare global {
     }
     // ------------------------------------
 
-    // configuration
+    // configuration - lib/utilities/configuration.ts - browser configuration settings
     interface browserArgs {
         [key:string]: string[];
     }
-    interface configuration {
+    interface configurationBrowser {
         campaignLocation: string;
         browser: {
             args: {
@@ -70,6 +70,81 @@ declare global {
                 [key:string]: string;
             };
         };
+    }
+    // ------------------------------------
+
+    // configurations - lib/configurations.json - global application environment rules
+    interface configurationApplication {
+        // cspell:disable
+        ".eslintignore": string[];
+        // cspell:enable
+        "eslintrc.json": {
+            env: {
+                [key:string]: boolean;
+            };
+            extends: string;
+            parser: string;
+            parserOptions: {
+                ecmaVersion: number;
+                sourceType: "module";
+            }
+            plugins: string[];
+            root: boolean;
+            rules: {
+                [key:string]: 0 | eslintCustom | eslintDelimiter | boolean | string[];
+            }
+        }
+        ".gitignore": string[];
+        "package-lock.json": {
+            name: string;
+            version: string;
+            lockfileVersion: number;
+            requires: boolean;
+            dependencies: {
+                [key:string]: {
+                    integrity: string;
+                    resolved: string;
+                    version: string;
+                }
+            }
+            devDependencies: {
+                [key:string]: string;
+            }
+        }
+    }
+    interface eslintDelimiterItem {
+        [key:string]: {
+            delimiter: string;
+            requireLast: boolean;
+        }
+    }
+    interface packageJSON {
+        author: string;
+        bin: string;
+        bugs: {
+            [key:string]: string;
+        };
+        command: string;
+        description: string;
+        devDependencies: {
+            [key:string]: string;
+        };
+        directories: {
+            [key:string]: string;
+        };
+        keywords: string[];
+        license: string;
+        main: string;
+        name: string;
+        repository: {
+            type: string;
+            url: string;
+        };
+        scripts: {
+            [key:string]: string;
+        };
+        type: "module";
+        version: string;
     }
     // ------------------------------------
 

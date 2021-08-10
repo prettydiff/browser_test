@@ -628,7 +628,7 @@ const build = function terminal_commands_build(test:boolean, callback:() => void
                                     }
 
                                     // eslint-disable-next-line
-                                    const packageData:any = JSON.parse(data),
+                                    const packageData:packageJSON = JSON.parse(data),
                                         commitHash = function terminal_commands_build_version_packStat_readPack_commitHash(hashErr:Error, stdout:string, stderr:string):void {
                                             const flag:flagList = {
                                                     config: false,
@@ -645,7 +645,7 @@ const build = function terminal_commands_build(test:boolean, callback:() => void
                                                         return;
                                                     }
                                                     // eslint-disable-next-line
-                                                    const config:any = JSON.parse(configFile),
+                                                    const config:configurationApplication = JSON.parse(configFile),
                                                         writeConfig = function terminal_commands_build_version_packStat_readPack_commitHash_readConfig_writeConfig(erc:Error):void {
                                                             if (erc !== null) {
                                                                 error([erc.toString()]);

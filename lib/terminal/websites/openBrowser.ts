@@ -9,7 +9,7 @@ import log from "../utilities/log.js";
 import server from "./server.js";
 import vars from "../utilities/vars.js";
 
-const openBrowser = function terminal_websites_openBrowser(campaign:campaign, options:websitesInput, configuration:configuration):void {
+const openBrowser = function terminal_websites_openBrowser(campaign:campaign, options:websitesInput, configuration:configurationBrowser):void {
     // this delay is necessary to launch the browser and allow it open before sending it commands
     options.browser = (options.browser === null)
         ? campaign.browser.toLowerCase().replace(/^edge$/, "msedge")

@@ -14,7 +14,7 @@ const args:browserArgs = {
             "--remote-debugging-port="
         ]
     },
-    configuration:configuration = {
+    configuration:configurationBrowser = {
         // campaignLocation value must point to the compiled JS file location
         campaignLocation: "",
         browser: {
@@ -42,7 +42,9 @@ const args:browserArgs = {
                     ? "C:\\Program Files\\Mozilla Firefox\\firefox.exe"
                     : "/usr/bin/firefox",
                 msedge  : (process.platform === "win32")
+                    // cspell:disable
                     ? "C:\\Windows\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\msedge.exe"
+                    // cspell:enable
                     : "Macintosh HD/ Applications/ Microsoft Edge",
                 opera   : (process.platform === "win32")
                     ? "C:\\Program Files\\Opera\\Launcher.exe"
