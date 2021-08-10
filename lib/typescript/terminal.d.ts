@@ -87,13 +87,13 @@ declare global {
             parserOptions: {
                 ecmaVersion: number;
                 sourceType: "module";
-            }
+            };
             plugins: string[];
             root: boolean;
             rules: {
-                [key:string]: 0 | eslintCustom | eslintDelimiter | boolean | string[];
-            }
-        }
+                [key:string]: eslintCustom | eslintDelimiter | string[] | boolean | 0;
+            };
+        };
         ".gitignore": string[];
         "package-lock.json": {
             name: string;
@@ -105,18 +105,18 @@ declare global {
                     integrity: string;
                     resolved: string;
                     version: string;
-                }
-            }
+                };
+            };
             devDependencies: {
                 [key:string]: string;
-            }
-        }
+            };
+        };
     }
     interface eslintDelimiterItem {
         [key:string]: {
             delimiter: string;
             requireLast: boolean;
-        }
+        };
     }
     interface packageJSON {
         author: string;

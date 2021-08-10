@@ -26,7 +26,7 @@ const request = function terminal_commands_request(address:string, callback:(fil
         const scheme:"http"|"https" = (address.indexOf("https") === 0)
                 ? "https"
                 : "http",
-            requestHandler = function terminal_commands_get_callback(res:IncomingMessage) {
+            requestHandler = function terminal_commands_get_callback(res:IncomingMessage):void {
                 res.on("data", function terminal_commands_get_callback_data(chunk:string):void {
                     file = file + chunk;
                 });
