@@ -174,5 +174,3 @@ Builds the application and then runs all the website related test commands
    - Optionally the delay can be specified with a value in milliseconds.  The default value is 2000 (2 seconds).  This is the delay between application launch, and thus browser window launch, and the firing of test instructions.  If the delay is too short the application will output an error because the browser won't be ready to receive tests.  If the delay is too long you are wasting your precious time.
 1. `drial websites campaign:demo noClose`
    - The default behavior is to terminate the application and close the browser upon test completion. The optional 'noClose' argument keeps everything open and alive for debugging and experimentation purposes.
-1. `drial websites campaign:demo browserMessaging`
-   - The argument prints all messaging from the browser to the terminal, except network traffic.  It also sets the option 'noClose' to true.

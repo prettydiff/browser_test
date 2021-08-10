@@ -1,11 +1,10 @@
 
 /* lib/terminal/websites/message - Message input/output to the browser via Chrome Developer Tools Protocol (CDP). */
 
-import { readFile } from "fs";
+import { readFile, writeFile } from "fs";
 import { Protocol } from "devtools-protocol";
 
 import error from "../utilities/error.js";
-import log from "../utilities/log.js";
 import results from "./results.js";
 import vars from "../utilities/vars.js";
 
@@ -15,7 +14,8 @@ import WebSocket from "../../ws-es6/index.js";
 let sendMessage:boolean = false,
     frameId:string = "",
     tests:testBrowserItem[] = null,
-    finished:boolean = false;
+    finished:boolean = false,
+    now:number = Date.now();
 const message:messageModule = {
     activePage: 0,
 
@@ -86,17 +86,25 @@ const message:messageModule = {
                 const parsed:devtoolsParameters = JSON.parse(data),
                     runTime:Protocol.Runtime.EvaluateResponse = JSON.parse(data).result,
                     method:string = parsed.method;
+                now = Date.now();
                 if ((/^\{"id":\d+,"result":\{/).test(data) === true) {
-                    if (config.options.browserMessaging === true) {
-                        const item:messageItem = message.messageQueue[parsed.id];
-                        // print out all browser messaging except network traffic
-                        parsed.method = item.method;
-                        if (parsed.method === "Runtime.evaluate") {
-                            parsed.page = `${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`;
-                            parsed.testId = item.params.testId;
-                            parsed.testName = item.params.testName;
-                        }
+                    const errorHandler = function terminal_websites_message_application_wsMessage_errorHandler(errorMessage:string[]):void {
+                            message.writeLog(function terminal_websites_message_application_wsMessage_errorHandler_callback():void {
+                                error(errorMessage, 1);
+                            });
+                        },
+                        item:messageItem = message.messageQueue[parsed.id];
+
+                    // format and log response data
+                    parsed.method = item.method;
+                    if (parsed.method === "Runtime.evaluate") {
+                        parsed.page = `${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`;
+                        parsed.testId = item.params.testId;
+                        parsed.testName = item.params.testName;
                     }
+                    message.log.response.push(parsed);
+                    message.log.summary.response.push(`${message.log.summary.response.length}, ${parsed.method}`);
+
                     if (runTime.exceptionDetails !== undefined && runTime.exceptionDetails.text === "window.drialRemote is undefined") {
                         // browser does not support the Page.addScriptToEvaluateOnNewDocument CDP method, so error
                         const errorMessage:string[] = [
@@ -109,7 +117,7 @@ const message:messageModule = {
                             errorMessage.push(`For firefox see defect ${vars.text.green + vars.text.bold}1601695${vars.text.none}, https://bugzilla.mozilla.org/show_bug.cgi?id=1601695`);
                         }
                         message.sendToQueue("Browser.close", {});
-                        error(errorMessage, 1);
+                        errorHandler(errorMessage);
                     } else if (runTime.result !== undefined && runTime.result.description !== undefined && runTime.result.description.indexOf("TypeError: Cannot read property 'parse' of undefined\n") === 0) {
                         // error - file remote not injected into page
                         const item:messageItem = message.messageQueue[parsed.id],
@@ -118,7 +126,7 @@ const message:messageModule = {
                                 `Page index ${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`
                             ];
                         message.sendToQueue("Browser.close", {});
-                        error(errorMessage, 1);
+                        errorHandler(errorMessage);
                     } else {
                         const targets:Protocol.Target.GetTargetsResponse = JSON.parse(data).result;
                         if (targets.targetInfos === undefined) {
@@ -129,6 +137,8 @@ const message:messageModule = {
                     }
                 } else {
                     const page:Protocol.Page.FrameStartedLoadingEvent = JSON.parse(data).params;
+                    message.log.events.push(parsed);
+                    message.log.summary.events.push(`${message.log.summary.events.length}, ${method}`);
                     if (frameId === "" && method === "Page.frameStartedLoading") {
                         // get the frameId for the starting page
                         // this is a compatibility work around for Firefox
@@ -161,7 +171,23 @@ const message:messageModule = {
                 if (openedTotal === opened) {
                     message.switchPage(currentPage, true);
                 }
-            };
+            },
+            interval = setInterval(function terminal_websites_message_application_interval():void {
+                if (Date.now() - now > 10000) {
+                    clearInterval(interval);
+                    message.writeLog(function terminal_websites_message_application_interval_handler():void {
+                        const hung:string[] = [
+                            `${vars.text.angry}Application has hung for more than 10 seconds.${vars.text.none}`,
+                            "Logs written."
+                        ];
+                        if (config.options.noClose === true) {
+                            error(hung);
+                        } else {
+                            error(hung, 1);
+                        }
+                    });
+                }
+            }, 4000);
         
         // read the remote.js as a string for injection into a page
         readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:Buffer):void {
@@ -176,7 +202,7 @@ const message:messageModule = {
                 });
                 message.send();
             } else {
-                error([readError.toString()]);
+                error([readError.toString()], 1);
             }
         });
 
@@ -191,11 +217,25 @@ const message:messageModule = {
     // index of the message queue
     indexTest: 0,
 
+    log: {
+        devtool_targets: null,
+        events: [],
+        response: [],
+        sent: [],
+        summary: {
+            events: [],
+            response: [],
+            sent: []
+        }
+    },
+
     // ordered list of messages to send to the browser
     messageQueue: [],
 
     // sends a given message to the browser
     send: function terminal_websites_message_send():void {
+        message.log.sent.push(message.messageQueue[message.indexMessage]);
+        message.log.summary.sent.push(`${message.indexMessage}, ${message.messageQueue[message.indexMessage].method}`);
         message.targets.page[message.activePage].ws.send(JSON.stringify(message.messageQueue[message.indexMessage]));
         if (message.messageQueue[message.indexMessage].method === "Page.addScriptToEvaluateOnNewDocument") {
             message.messageQueue[message.indexMessage].params = {};
@@ -204,11 +244,14 @@ const message:messageModule = {
 
     // close the browser when tests are complete
     sendClose: function terminal_websites_message_sendClose(noClose:boolean, exitType:0|1):void {
+        const closeHandler = function terminal_websites_message_sendClose_closeHandler():void {
+            if (noClose === false) {
+                message.sendToQueue("Browser.close", {});
+                process.exit(exitType);
+            }
+        };
         finished = true;
-        if (noClose === false) {
-            message.sendToQueue("Browser.close", {});
-            process.exit(exitType);
-        }
+        message.writeLog(closeHandler);
     },
 
     // queue a test into the message queue
@@ -262,7 +305,16 @@ const message:messageModule = {
             message.sendToQueue("Page.bringToFront", {});
         }
     },
-    targets: {}
+
+    // store lists of communication points in the browser
+    targets: {},
+
+    // write communication data to file
+    writeLog: function terminal_websites_message_writeLog(callback:() => void):void {
+        writeFile(`${vars.projectPath}log.json`, JSON.stringify(message.log).replace(/"devtool_targets":null,/, `"devtool_targets":${JSON.stringify(message.targets)},`), "utf8", function terminal_websites_message_writeLog_callback():void {
+            callback();
+        });
+    }
 };
 
 export default message;

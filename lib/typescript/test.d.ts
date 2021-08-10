@@ -35,11 +35,23 @@ declare global {
         method: string;
         params: devtoolsParameters;
     }
+    interface messageLog {
+        devtool_targets: targetList;
+        events: devtoolsParameters[];
+        response: devtoolsParameters[];
+        sent: messageItem[];
+        summary: {
+            events: string[];
+            response: string[];
+            sent: string[];
+        };
+    }
     interface messageModule {
         activePage: number;
         application: (config:browserMessageConfig) => void;
         indexMessage: number;
         indexTest: number;
+        log: messageLog;
         messageQueue: messageItem[];
         send: () => void;
         sendClose: (noClose:boolean, exitType:0|1) => void;
@@ -48,6 +60,7 @@ declare global {
         sendToQueue: (method:string, params:devtoolsParameters) => void;
         switchPage: (pageIndex:number, newPage:boolean) => void;
         targets: targetList;
+        writeLog: (callback:() => void) => void;
     }
     interface targetList {
         [key: string]: targetListItem[];
@@ -95,7 +108,6 @@ declare global {
     // websites
     interface websitesInput {
         browser: string;
-        browserMessaging: boolean;
         campaignName: string;
         delay:number;
         devtools: boolean;
