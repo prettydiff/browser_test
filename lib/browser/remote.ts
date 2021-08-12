@@ -643,7 +643,9 @@ window.drialRemote = {
     parse: function browser_remote_parse(testString:string):boolean {
         if (typeof testString === "string" && (/^\s*\{\s*"(action)"\s*:/).test(testString) === true) {
             const route:testBrowserRoute = JSON.parse(testString);
-            window.drialRemote.event(route, false);
+            if (route.index > window.drialRemote.index) {
+                window.drialRemote.event(route, false);
+            }
         } else {
             // eslint-disable-next-line
             console.error(`Drial - Poorly formed testString\n${testString}. It does not appear to be a drial test.`);

@@ -12,7 +12,7 @@ import vars from "../utilities/vars.js";
 const openBrowser = function terminal_websites_openBrowser(campaign:campaign, options:websitesInput, configuration:configurationBrowser):void {
     // this delay is necessary to launch the browser and allow it open before sending it commands
     options.browser = (options.browser === null)
-        ? campaign.browser.toLowerCase().replace(/^edge$/, "msedge")
+        ? campaign.options.browser.toLowerCase().replace(/^edge$/, "msedge")
         : options.browser.toLowerCase().replace(/^edge$/, "msedge");
     if (configuration.browser.executable[options.browser] === undefined) {
         error([
@@ -36,7 +36,14 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             const listenWrapper = function terminal_websites_openBrowser_timeout_listenWrapper():void {
                 listener(campaign, options, server);
             };
-            log([`Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`]);
+            log([
+                `Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`,
+                `Option browser: ${vars.text.green + vars.text.bold + options.browser + vars.text.none}`,
+                `Option delay: ${vars.text.green + vars.text.bold + options.delay + vars.text.none}`,
+                `Option devtools: ${vars.text.green + vars.text.bold + options.devtools + vars.text.none}`,
+                `Option noClose: ${vars.text.green + vars.text.bold + options.noClose + vars.text.none}`,
+                `Campaign: ${vars.text.green + vars.text.bold + options.campaignName + vars.text.none}, ${configuration.campaignLocation + options.campaignName}`,
+            ]);
             server.listen({
                 port: 0
             }, listenWrapper);
@@ -72,6 +79,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             shell: true
         });
 
+    // stderr
     spawnItem.stderr.on("data", function terminal_websites_openBrowser_spawnStderr(data:Buffer):void {
         let str:string = data.toString();
         if (str.indexOf("DevTools listening on ws") > -1) {
@@ -89,6 +97,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
         }
     });
 
+    // stdout
     spawnItem.stdout.on("data", function terminal_websites_openBrowser_spawnStdout(data:Buffer):void {
         let str:string = data.toString();
         if (str.indexOf("DBG-SERVER: Socket listening on: ") > -1) {

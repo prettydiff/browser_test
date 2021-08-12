@@ -8,6 +8,7 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[commands.md](commands.md)**                                                                                 - This documentation describes the various supported terminal commands and is automatically generated from `lib/terminal/utilities/commands_documentation.ts`.
    - **[configuration.md](configuration.md)**                                                                       - How to use and modify this application.
    - **[library_list.md](library_list.md)**                                                                         - Automated list of all code and documentation files with brief descriptions.
+   - **[logs.md](logs.md)**                                                                                         - Describing the drial log file.
    - **[problems.md](problems.md)**                                                                                 - A list of problems I have encountered and have not solved.
    - **[website_tests.md](website_tests.md)**                                                                       - How this application defines tests for websites.
 * Directory *[../lib/browser](../lib/browser)*
@@ -42,7 +43,6 @@ This is a dynamically compiled list of supporting code files that comprise this 
    - **[../lib/terminal/utilities/vars.ts](../lib/terminal/utilities/vars.ts)**                                     - Globally available variables for the terminal utility.
    - **[../lib/terminal/utilities/wrapIt.ts](../lib/terminal/utilities/wrapIt.ts)**                                 - A tool to perform word wrap when printing text to the shell.
 * Directory *[../lib/terminal/websites](../lib/terminal/websites)*
-   - **[../lib/terminal/websites/index.ts](../lib/terminal/websites/index.ts)**                                     - The code that allows testing of websites.
    - **[../lib/terminal/websites/iterate.ts](../lib/terminal/websites/iterate.ts)**                                 - Push the next test item.
    - **[../lib/terminal/websites/listener.ts](../lib/terminal/websites/listener.ts)**                               - A service listener that processes input and output to the web browser.
    - **[../lib/terminal/websites/message.ts](../lib/terminal/websites/message.ts)**                                 - Message input/output to the browser via Chrome Developer Tools Protocol (CDP).

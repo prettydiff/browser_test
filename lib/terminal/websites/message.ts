@@ -12,9 +12,9 @@ import vars from "../utilities/vars.js";
 import WebSocket from "../../ws-es6/index.js";
 
 let sendMessage:boolean = false,
-    tests:testBrowserItem[] = null,
     finished:boolean = false,
-    now:number = Date.now();
+    now:number = Date.now(),
+    interval:NodeJS.Timeout = null;
 const message:messageModule = {
     activePage: 0,
 
@@ -55,6 +55,7 @@ const message:messageModule = {
                         message.targets[list[a].type].push(list[a]);
                         if (list[a].type === "page") {
                             list[a].id = id;
+                            list[a].ready = false;
                             list[a].ws = new WebSocket(`ws://127.0.0.1:${config.options.port}/devtools/page/${id}`, {perMessageDeflate: false});
                             list[a].ws.pageId = message.targets.page.length - 1;
                             list[a].ws.targetId = id;
@@ -74,7 +75,7 @@ const message:messageModule = {
                     source: remote
                 });
             },
-            queue = function terminal_websites_message_application_wsMessage_queue(id:number):void {
+            queue = function terminal_websites_message_application_queue(id:number):void {
                 message.indexMessage = id + 1;
                 if (message.indexMessage === message.messageQueue.length) {
                     sendMessage = true;
@@ -82,6 +83,19 @@ const message:messageModule = {
                     sendMessage = false;
                     message.send();
                 }
+            },
+            pageReady = function terminal_websites_message_application_pageReady(id:string):void {
+                let a:number = message.targets.page.length;
+                do {
+                    a = a - 1;
+                    if (message.targets.page[a].id === id) {
+                        message.targets.page[a].ready = true;
+                        if (a === message.activePage) {
+                            message.sendTest(message.indexTest, true);
+                        }
+                        return;
+                    }
+                } while (a > 0);
             },
             wsMessage = function terminal_websites_message_application_wsMessage(data:string):void {
                 const parsed:devtoolsParameters = JSON.parse(data),
@@ -99,7 +113,7 @@ const message:messageModule = {
                     // format and log response data
                     parsed.method = item.method;
                     if (parsed.method === "Runtime.evaluate") {
-                        parsed.page = `${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`;
+                        parsed.page = `${message.tests[item.params.testId].page}, ${message.targets.page[message.tests[item.params.testId].page].url}`;
                         parsed.testId = item.params.testId;
                         parsed.testName = item.params.testName;
                     }
@@ -124,7 +138,7 @@ const message:messageModule = {
                         const item:messageItem = message.messageQueue[parsed.id],
                             errorMessage:string[] = [
                                 `${vars.text.angry}Test failure.  Required file not injected into page:${vars.text.none}`,
-                                `Page index ${tests[item.params.testId].page}, ${message.targets.page[tests[item.params.testId].page].url}`
+                                `Page index ${message.tests[item.params.testId].page}, ${message.targets.page[message.tests[item.params.testId].page].url}`
                             ];
                         message.sendToQueue("Browser.close", {});
                         errorHandler(errorMessage);
@@ -142,15 +156,16 @@ const message:messageModule = {
                     message.log.summary.events.push(`${message.log.summary.events.length}, ${method}`);
                     if (method === "Page.domContentEventFired") {
                         // inject code into next requested page
+                        message.targets.page[message.activePage].ready = false;
                         sendRemote();
                     } else if (method === "Runtime.consoleAPICalled" && data.indexOf("Drial - report") > 0) {
                         // reading a test result from the browser
                         const consoleEvent:Protocol.Runtime.ConsoleAPICalledEvent = JSON.parse(data).params,
                             result:testBrowserRoute = JSON.parse(consoleEvent.args[0].value.replace("Drial - report:", ""));
-                        results(result, config.campaign.tests, config.options.noClose);
-                    } else if (method === "Page.frameStoppedLoading" && page.frameId === message.targets.page[message.activePage].id) {
+                        results(result, config.options.noClose);
+                    } else if (method === "Page.frameStoppedLoading") {
                         // send a test
-                        message.sendTest(message.indexTest, true);
+                        pageReady(page.frameId);
                     } else if (method === "Page.windowOpen") {
                         message.sendToQueue("Target.getTargets", {});
                     }
@@ -179,29 +194,30 @@ const message:messageModule = {
                         message.switchPage(currentPage, true);
                     }
                 }
-            },
-            interval = setInterval(function terminal_websites_message_application_interval():void {
-                if (Date.now() - now > 10000) {
-                    clearInterval(interval);
-                    message.writeLog(function terminal_websites_message_application_interval_handler():void {
-                        const hung:string[] = [
-                            `${vars.text.angry}Application has hung for more than 10 seconds.${vars.text.none}`,
-                            "Logs written.\u0007"
-                        ];
-                        if (config.options.noClose === true) {
-                            error(hung);
-                        } else {
-                            error(hung, 1);
-                        }
-                    });
-                }
-            }, 4000);
+            };
 
-        tests = config.campaign.tests;
+        // the interval ensures that logs are written even if the application cannot close on its own due to lost messaging
+        interval = setInterval(function terminal_websites_message_application_interval():void {
+            if (Date.now() - now > 10000) {
+                clearInterval(interval);
+                message.writeLog(function terminal_websites_message_application_interval_handler():void {
+                    const hung:string[] = [
+                        `${vars.text.angry}Application has hung for more than 10 seconds.${vars.text.none}`,
+                        "Logs written.\u0007"
+                    ];
+                    if (config.options.noClose === true) {
+                        error(hung);
+                    } else {
+                        error(hung, 1);
+                    }
+                });
+            }
+        }, 4000);
         
         // read the remote.js as a string for injection into a page
         readFile(`${vars.js}lib${vars.sep}browser${vars.sep}remote.js`, function terminal_websites_message_readRemote(readError:Error, fileData:Buffer):void {
             if (readError === null) {
+                message.tests = config.campaign.tests;
                 remote = fileData.toString().replace(/serverPort:\s+\d+,/, `serverPort: ${config.serverAddress.port},`).replace("export {}", "");
 
                 // populate targets from initial page request
@@ -247,11 +263,15 @@ const message:messageModule = {
     sendClose: function terminal_websites_message_sendClose(noClose:boolean, exitType:0|1):void {
         const closeHandler = function terminal_websites_message_sendClose_closeHandler():void {
             if (noClose === false) {
-                message.sendToQueue("Browser.close", {});
+                let a:number = message.targets.page.length;
+                if (a < 2) {
+                    message.sendToQueue("Browser.close", {});
+                }
                 process.exit(exitType);
             }
         };
         finished = true;
+        clearInterval(interval);
         message.writeLog(closeHandler);
     },
 
@@ -263,12 +283,12 @@ const message:messageModule = {
                 exit: null,
                 index: index,
                 result: null,
-                test: tests[index]
+                test: message.tests[index]
             };
             message.indexTest = index;
-            if (message.activePage !== tests[index].page) {
+            if (message.activePage !== message.tests[index].page) {
                 // ensure a different page is active and visible
-                message.switchPage(tests[index].page, false);
+                message.switchPage(message.tests[index].page, false);
             }
             if (refresh === true) {
                 // an interaction that triggers a page refresh must be set to null to avoid a loop
@@ -278,8 +298,9 @@ const message:messageModule = {
             message.sendToQueue("Runtime.evaluate", {
                 expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`,
                 testId: index,
-                testName: tests[index].name
+                testName: message.tests[index].name
             });
+
         }
     },
 
@@ -309,6 +330,9 @@ const message:messageModule = {
 
     // store lists of communication points in the browser
     targets: {},
+
+    // the test instructions from the campaign document
+    tests: null,
 
     // write communication data to file
     writeLog: function terminal_websites_message_writeLog(callback:() => void):void {

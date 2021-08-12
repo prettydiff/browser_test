@@ -3,8 +3,13 @@
 const demo:campaign = {
     // the initial page to load into the browser
     startPage: "https://promo.bankofamerica.com/advantage_banking/?cm_sp=DEP-Checking-_-NotAssigned-",
-    browser: "chrome",
-    port: 0,
+    options: {
+        browser: "chrome",
+        delay: 0,
+        devtools: false,
+        noClose: false,
+        port: 0
+    },
     tests: [
 
         // verify artifacts on the start page
@@ -258,6 +263,11 @@ const demo:campaign = {
                 value: 10
             },
             interaction: [
+                {
+                    event: "wait",
+                    node: [],
+                    value: "1000"
+                },
                 {
                     event: "click",
                     node: [

@@ -7,8 +7,7 @@ declare global {
     // campaigns
     interface campaign {
         startPage: string;
-        browser: browser;
-        port: number;
+        options?: websitesInput;
         tests: testBrowserItem[];
     }
     interface campaignModule {
@@ -60,6 +59,7 @@ declare global {
         sendToQueue: (method:string, params:devtoolsParameters) => void;
         switchPage: (pageIndex:number, newPage:boolean) => void;
         targets: targetList;
+        tests: testBrowserItem[];
         writeLog: (callback:() => void) => void;
     }
     interface targetList {
@@ -67,6 +67,7 @@ declare global {
     }
     interface targetListItem extends Protocol.Target.TargetInfo {
         id: string;
+        ready: boolean;
         // eslint-disable-next-line
         ws?: any;
     }
@@ -107,12 +108,12 @@ declare global {
 
     // websites
     interface websitesInput {
-        browser: string;
-        campaignName: string;
-        delay:number;
-        devtools: boolean;
-        noClose: boolean;
-        port: number;
+        browser?: string;
+        campaignName?: string;
+        delay?:number;
+        devtools?: boolean;
+        noClose?: boolean;
+        port?: number;
     }
     // ------------------------------------
 }

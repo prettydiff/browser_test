@@ -4,7 +4,6 @@ The various website test libraries
 ## Files
 <!-- Do not edit below this line.  Contents dynamically populated. -->
 
-* **[index.ts](index.ts)**                         - The code that allows testing of websites.
 * **[iterate.ts](iterate.ts)**                     - Push the next test item.
 * **[listener.ts](listener.ts)**                   - A service listener that processes input and output to the web browser.
 * **[message.ts](message.ts)**                     - Message input/output to the browser via Chrome Developer Tools Protocol (CDP).

@@ -18,6 +18,7 @@ declare global {
     type eventCallback = (event:Event, callback:Function) => void;
     type eventName = "blur" | "click" | "contextmenu" | "dblclick" | "focus" | "historyBack" | "historyForward" | "keydown" | "keyup" | "mousedown" | "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover" | "mouseup" | "move" | "pageAddress" | "refresh-interaction" | "refresh" | "resize" | "select" | "setValue" | "touchend" | "touchstart" | "wait";
     type fileAction = "fs-base64" | "fs-close" | "fs-destroy" | "fs-details" | "fs-directory" | "fs-execute" | "fs-hash" | "fs-new" | "fs-read" | "fs-rename" | "fs-search" | "fs-write";
+    type optionNames = "browser" | "delay" | "devtools" | "noClose" | "port";
     type primitive = boolean | number | string | null | undefined;
     type qualifier = "begins" | "contains" | "ends" | "greater" | "is" | "lesser" | "not contains" | "not";
     type qualifierFile = "file begins" | "file contains" | "file ends" | "file is" | "file not contains" | "file not" | "filesystem contains" | "filesystem not contains";

@@ -6,27 +6,27 @@ import log from "../utilities/log.js";
 import message from "./message.js";
 import vars from "../utilities/vars.js";
 
-const results = function terminal_websites_results(item:testBrowserRoute, tests:testBrowserItem[], noClose:boolean):void {
+const results = function terminal_websites_results(item:testBrowserRoute, noClose:boolean):void {
     let a:number = 0,
         falseFlag:boolean = false,
         index:number = -1;
     const result: [boolean, string, string][] = item.result,
         length:number = result.length,
-        delay:boolean = (tests[item.index].unit.length === 0),
+        delay:boolean = (message.tests[item.index].unit.length === 0),
 
         // handles the completion of a test whether a failure or 100% pass
         completion = function terminal_websites_results_completion(pass:boolean):void {
-            const plural:string = (tests.length === 1)
+            const plural:string = (message.tests.length === 1)
                     ? ""
                     : "s",
                 totalTests:number = (function terminal_websites_results_completion_total():number {
                     // gathers a total count of tests
-                    let aa:number = tests.length,
+                    let aa:number = message.tests.length,
                         bb:number = 0;
                     do {
                         aa = aa - 1;
-                        bb = bb + tests[aa].unit.length;
-                        if (tests[aa].delay !== undefined) {
+                        bb = bb + message.tests[aa].unit.length;
+                        if (message.tests[aa].delay !== undefined) {
                             bb = bb + 1;
                         }
                     } while (aa > 0);
@@ -44,7 +44,7 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
                 exit(`${humanTime(false) + vars.text.green + vars.text.bold}Passed${vars.text.none} all ${totalTests} evaluations from ${index + 1} test${passPlural}.`, 0);
                 return;
             }
-            exit(`${humanTime(false) + vars.text.angry}Failed${vars.text.none} on test ${vars.text.angry + (index + 1) + vars.text.none}: "${vars.text.cyan + tests[index].name + vars.text.none}" out of ${tests.length} total test${plural} and ${totalTests} evaluations.`, 1);
+            exit(`${humanTime(false) + vars.text.angry}Failed${vars.text.none} on test ${vars.text.angry + (index + 1) + vars.text.none}: "${vars.text.cyan + message.tests[index].name + vars.text.none}" out of ${message.tests.length} total test${plural} and ${totalTests} evaluations.`, 1);
         },
 
         // the summary messaging
@@ -52,7 +52,7 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
             const resultString:string = (pass === true)
                     ? `${vars.text.green}Passed`
                     : `${vars.text.angry}Failed`;
-            return `${humanTime(false) + resultString} ${index + 1}: ${vars.text.none + tests[index].name}`;
+            return `${humanTime(false) + resultString} ${index + 1}: ${vars.text.none + message.tests[index].name}`;
         },
 
         // build a string that provides representative DOM method chain for executing in the browser console
@@ -113,7 +113,7 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
                 star:string = `   ${vars.text.angry}*${vars.text.none} `,
                 resultString:string = (pass === true)
                     ? `${vars.text.green}Passed:`
-                    : (config === tests[index].delay)
+                    : (config === message.tests[index].delay)
                         ? `${vars.text.angry}Failed (delay timeout):`
                         : `${vars.text.angry}Failed:`,
                 qualifier:string = (config.qualifier === "begins")
@@ -171,11 +171,11 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
                     failure.push(`     Provided: ${vars.text.angry}[${segments[1] + vars.text.none}`);
                 }
                 failure.push(`     ${vars.text.cyan + result[a][2] + vars.text.none}`);
-            } else if ((delay === false && result[a][2] === buildNode(tests[index].unit[a], true)) || (delay === true && result[a][2] === buildNode(tests[index].delay, true))) {
+            } else if ((delay === false && result[a][2] === buildNode(message.tests[index].unit[a], true)) || (delay === true && result[a][2] === buildNode(message.tests[index].delay, true))) {
                 failure.push(`     ${vars.text.green}Actual value:${vars.text.none}\n${vars.text.cyan + result[a][1].replace(/^"/, "").replace(/"$/, "").replace(/\\"/g, "\"") + vars.text.none}`);
-            } else if ((delay === false && tests[index].unit[a].value === null) || (delay === true && tests[index].delay.value === null)) {
+            } else if ((delay === false && message.tests[index].unit[a].value === null) || (delay === true && message.tests[index].delay.value === null)) {
                 failure.push(`     DOM node is not null: ${vars.text.cyan + result[a][2] + vars.text.none}`);
-            } else if ((delay === false && tests[index].unit[a].value === undefined) || (delay === true && tests[index].delay.value === undefined)) {
+            } else if ((delay === false && message.tests[index].unit[a].value === undefined) || (delay === true && message.tests[index].delay.value === undefined)) {
                 failure.push(`     DOM node is not undefined: ${vars.text.cyan + result[a][2] + vars.text.none}`);
             } else {
                 failure.push(`     DOM node is ${result[a][1]}: ${vars.text.cyan + result[a][2] + vars.text.none}`);
@@ -186,12 +186,12 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
     if (index < item.index) {
         index = item.index;
         if (result[0][0] === false && result[0][1] === "delay timeout") {
-            failure.push(testString(false, tests[index].delay));
-            if (tests[index].delay.type === "element") {
-                const qualifier:string = (tests[index].delay.qualifier === "not")
+            failure.push(testString(false, message.tests[index].delay));
+            if (message.tests[index].delay.type === "element") {
+                const qualifier:string = (message.tests[index].delay.qualifier === "not")
                     ? " not"
                     : "";
-                failure.push(`     DOM node is${qualifier} ${tests[index].delay.value}: ${vars.text.cyan + result[1][1] + vars.text.none}`);
+                failure.push(`     DOM node is${qualifier} ${message.tests[index].delay.value}: ${vars.text.cyan + result[1][1] + vars.text.none}`);
             } else {
                 failure.push(`     ${vars.text.green}Actual value:${vars.text.none}\n${vars.text.cyan + result[1][1].replace(/^"/, "").replace(/"$/, "").replace(/\\"/g, "\"") + vars.text.none}`);
             }
@@ -204,14 +204,14 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
             failure.push(`     Specified event node is: ${vars.text.cyan + result[0][2] + vars.text.none}`);
             falseFlag = true;
         } else if (delay === true) {
-            failure.push(testString(result[a][0], tests[index].delay));
+            failure.push(testString(result[a][0], message.tests[index].delay));
             if (result[a][0] === false) {
                 failureMessage();
                 falseFlag = true;
             }
         } else {
             do {
-                failure.push(testString(result[a][0], tests[index].unit[a]));
+                failure.push(testString(result[a][0], message.tests[index].unit[a]));
                 if (result[a][0] === false) {
                     failureMessage();
                     falseFlag = true;
@@ -227,8 +227,8 @@ const results = function terminal_websites_results(item:testBrowserRoute, tests:
             return;
         }
         log([summary(true)]);
-        if (index + 1 < tests.length) {
-            iterate(tests, index + 1, noClose);
+        if (index + 1 < message.tests.length) {
+            iterate(noClose);
         } else {
             completion(true);
         }
