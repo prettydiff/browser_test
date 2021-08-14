@@ -233,7 +233,7 @@ const directory = function terminal_commands_directory(parameters:readDirectory)
             },
             statWrapper = function terminal_commands_directory_statWrapper(filePath:string, parent:number):void {
                 const statHandler = function terminal_commands_directory_statWrapper_statHandler(er:Error, statItem:Stats):void {
-                    const statData:directoryData = (stat === undefined)
+                    const statData:directoryData = (statItem === undefined)
                         ? null
                         : {
                             atimeMs: statItem.atimeMs,
