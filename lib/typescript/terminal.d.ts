@@ -75,9 +75,8 @@ declare global {
 
     // configurations - lib/configurations.json - global application environment rules
     interface configurationApplication {
-        // cspell:disable
+        // cspell:disable-next-line
         ".eslintignore": string[];
-        // cspell:enable
         "eslintrc.json": {
             env: {
                 [key:string]: boolean;
@@ -95,6 +94,8 @@ declare global {
             };
         };
         ".gitignore": string[];
+        // cspell:disable-next-line
+        ".npmignore": string[];
         "package-lock.json": {
             name: string;
             version: string;
