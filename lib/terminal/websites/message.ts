@@ -12,7 +12,6 @@ import vars from "../utilities/vars.js";
 import WebSocket from "../../ws-es6/index.js";
 
 let sendMessage:boolean = false,
-    finished:boolean = false,
     now:number = Date.now(),
     interval:NodeJS.Timeout = null;
 const message:messageModule = {
@@ -203,13 +202,18 @@ const message:messageModule = {
                 message.writeLog(function terminal_websites_message_application_interval_handler():void {
                     const hung:string[] = [
                         `${vars.text.angry}Application has hung for more than 10 seconds.${vars.text.none}`,
+                        "This could be due to one of two cases:",
+                        `1. Most likely the ${vars.text.angry}page isn't ready${vars.text.none} for the requested user interaction.`,
+                        "   Try a wait event in the test campaign immediately prior to the failing event.",
+                        "   Example: {event: \"wait\", node: [], value: \"1000\"}",
+                        `2. This ${vars.text.angry}application submitted incorrect instructions${vars.text.none} to the browser,`,
+                        "   which breaks the browser's ability to send a response.",
+                        "   Incorrect instructions is the less likely cause of this problem.",
+                        "",
                         "Logs written.\u0007"
                     ];
-                    if (config.options.noClose === true) {
-                        error(hung);
-                    } else {
-                        error(hung, 1);
-                    }
+                    error(hung);
+                    message.sendClose(config.options.noClose, 1);
                 });
             }
         }, 4000);
@@ -261,47 +265,52 @@ const message:messageModule = {
 
     // close the browser when tests are complete
     sendClose: function terminal_websites_message_sendClose(noClose:boolean, exitType:0|1):void {
-        const closeHandler = function terminal_websites_message_sendClose_closeHandler():void {
-            if (noClose === false) {
-                let a:number = message.targets.page.length;
-                if (a < 2) {
-                    message.sendToQueue("Browser.close", {});
-                }
-                process.exit(exitType);
-            }
-        };
-        finished = true;
         clearInterval(interval);
-        message.writeLog(closeHandler);
+        if (noClose === false) {
+            let a:number = message.targets.page.length;
+            if (a < 2) {
+                message.sendToQueue("Browser.close", {});
+            } else {
+                do {
+                    a = a - 1;
+                    message.switchPage(a, false);
+                    message.sendToQueue("Browser.close", {});
+                } while (a > 0);
+            }
+        }
+        setTimeout(function terminal_websites_message_sendClose_exitInterval():void {
+            message.writeLog(function terminal_websites_message_sendClose_exitInterval_writeLog():void {
+                if (noClose === false) {
+                    process.exit(exitType);
+                }
+            });
+        }, 150);
     },
 
     // queue a test into the message queue
     sendTest: function terminal_websites_message_sendTest(index:number, refresh:boolean):void {
-        if (finished === false) {
-            const route:testBrowserRoute = {
-                action: "result",
-                exit: null,
-                index: index,
-                result: null,
-                test: message.tests[index]
-            };
-            message.indexTest = index;
-            if (message.activePage !== message.tests[index].page) {
-                // ensure a different page is active and visible
-                message.switchPage(message.tests[index].page, false);
-            }
-            if (refresh === true) {
-                // an interaction that triggers a page refresh must be set to null to avoid a loop
-                route.test.interaction = null;
-            }
-            // send the current test to the browser
-            message.sendToQueue("Runtime.evaluate", {
-                expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`,
-                testId: index,
-                testName: message.tests[index].name
-            });
-
+        const route:testBrowserRoute = {
+            action: "result",
+            exit: null,
+            index: index,
+            result: null,
+            test: message.tests[index]
+        };
+        message.indexTest = index;
+        if (message.activePage !== message.tests[index].page) {
+            // ensure a different page is active and visible
+            message.switchPage(message.tests[index].page, false);
         }
+        if (refresh === true) {
+            // an interaction that triggers a page refresh must be set to null to avoid a loop
+            route.test.interaction = null;
+        }
+        // send the current test to the browser
+        message.sendToQueue("Runtime.evaluate", {
+            expression: `window.drialRemote.parse('${JSON.stringify(route).replace(/'/g, "\\'")}')`,
+            testId: index,
+            testName: message.tests[index].name
+        });
     },
 
     // pushes uniform message data into the message queue

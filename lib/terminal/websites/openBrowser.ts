@@ -37,12 +37,16 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                 listener(campaign, options, server);
             };
             log([
-                `Browser port: ${vars.text.green + vars.text.bold + options.port + vars.text.none}`,
-                `Option browser: ${vars.text.green + vars.text.bold + options.browser + vars.text.none}`,
-                `Option delay: ${vars.text.green + vars.text.bold + options.delay + vars.text.none}`,
+                "",
+                `${vars.text.underline + vars.text.bold + vars.text.cyan}Options${vars.text.none}`,
+                `Browser port   : ${vars.text.green + vars.text.bold + options.port + vars.text.none}`,
+                `Option browser : ${vars.text.green + vars.text.bold + options.browser + vars.text.none}`,
+                `Option delay   : ${vars.text.green + vars.text.bold + options.delay + vars.text.none}`,
                 `Option devtools: ${vars.text.green + vars.text.bold + options.devtools + vars.text.none}`,
-                `Option noClose: ${vars.text.green + vars.text.bold + options.noClose + vars.text.none}`,
-                `Campaign: ${vars.text.green + vars.text.bold + options.campaignName + vars.text.none}, ${configuration.campaignLocation + options.campaignName}`,
+                `Option noClose : ${vars.text.green + vars.text.bold + options.noClose + vars.text.none}`,
+                `Campaign       : ${vars.text.green + vars.text.bold + options.campaignName + vars.text.none}, ${configuration.campaignLocation + options.campaignName}`,
+                "",
+                `${vars.text.underline + vars.text.bold + vars.text.cyan}Tests${vars.text.none}`
             ]);
             server.listen({
                 port: 0
