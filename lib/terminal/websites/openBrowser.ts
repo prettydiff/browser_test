@@ -54,8 +54,10 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
         },
         // open a browser in the OS with its appropriate flags and port number
         args = (function terminal_websites_openBrowser_chrome():string[] {
+            const args:string[] = configuration.browser.args[options.browser],
+                profile:string = options.campaignName.replace(/<>\\\/":\|\?\*[\u0000-\u0020][\u007f-\u009f]/g, "");
             // unsupported browser
-            if (configuration.browser.args[options.browser] === undefined || configuration.browser.executable[options.browser] === undefined || configuration.browser.executable[options.browser] === "") {
+            if (args === undefined || configuration.browser.executable[options.browser] === undefined || configuration.browser.executable[options.browser] === "") {
                 error([
                     `${vars.text.angry}Specified browser ${options.browser} is not supported.${vars.text.none}`,
                     "",
@@ -65,18 +67,20 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                     `${vars.text.angry}*${vars.text.none} Submit a pull request to https://github.com/prettydiff/drial`,
                 ], 1);
             }
-            configuration.browser.args[options.browser][configuration.browser.args[options.browser].indexOf("--remote-debugging-port=")] = `--remote-debugging-port=${options.port.toString()}`;
-            configuration.browser.args[options.browser].splice(0, 0, "about:blank");
+            args[args.indexOf("--remote-debugging-port=")] = `--remote-debugging-port=${options.port.toString()}`;
+            args.splice(0, 0, "about:blank");
             if (chrome === true) {
                 if (options.devtools === true) {
-                    configuration.browser.args[options.browser].push("--auto-open-devtools-for-tabs");
+                    args.push("--auto-open-devtools-for-tabs");
                 }
+                args[args.indexOf("--profile-directory=\"\"")] = `--profile-directory=\"${profile}\"`;
             } else {
                 if (options.devtools === true) {
-                    configuration.browser.args[options.browser].push("--devtools");
+                    args.push("--devtools");
                 }
+                args.splice(args.indexOf("-profile") + 1, 0, profile);
             }
-            return configuration.browser.args[options.browser];
+            return args;
         }()),
         spawnItem:ChildProcess = spawn(`"${configuration.browser.executable[options.browser]}"`, args, {
             cwd: vars.projectPath,
@@ -96,7 +100,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
             // error about profile violations in chrome
             error([
                 `${vars.text.angry}Browser profile conflict.${vars.text.none}`,
-                `Close all instances of browser ${vars.text.cyan + options.browser + vars.text.none} and try again.`
+                `Close all prior instances of browser ${vars.text.cyan + options.browser + vars.text.none} executed with campaign ${vars.text.cyan + options.campaignName + vars.text.none} and try again.`
             ], 1);
         }
     });

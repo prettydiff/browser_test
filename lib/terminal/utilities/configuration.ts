@@ -4,6 +4,7 @@
 // * command should be the full list of arguments associated with the given browser except port number
 const args:browserArgs = {
         chrome: [
+            "--profile-directory=\"\"",
             "--no-first-run",
             "--no-default-browser-check",
             "--disable-popup-blocking",
@@ -11,6 +12,7 @@ const args:browserArgs = {
         ],
         firefox: [
             "-vvv",
+            "-profile",
             "--remote-debugging-port="
         ]
     },

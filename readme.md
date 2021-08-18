@@ -1,5 +1,5 @@
 # Drial
-Simple test automation in the browser for people familiar with JavaScript.  No third party madness and no additional APIs to learn.
+Simple test automation in the browser completely from the perspective of an end user clicking and typing things.  No third party madness and no additional APIs to learn.
 
 ## License
 [AGPLv3](LICENSE)
