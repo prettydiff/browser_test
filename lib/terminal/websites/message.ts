@@ -116,8 +116,8 @@ const message:messageModule = {
                         parsed.testId = item.params.testId;
                         parsed.testName = item.params.testName;
                     }
-                    message.log.response.push(parsed);
-                    message.log.summary.response.push(`${message.log.summary.response.length}, ${parsed.method}`);
+                    message.log.messages.response.push(parsed);
+                    message.log.messages_summary.response.push(`${message.log.messages_summary.response.length}, ${parsed.method}`);
 
                     if (runTime.exceptionDetails !== undefined && runTime.exceptionDetails.text === "window.drialRemote is undefined") {
                         // browser does not support the Page.addScriptToEvaluateOnNewDocument CDP method, so error
@@ -151,8 +151,8 @@ const message:messageModule = {
                     }
                 } else {
                     const page:Protocol.Page.FrameStartedLoadingEvent = JSON.parse(data).params;
-                    message.log.events.push(parsed);
-                    message.log.summary.events.push(`${message.log.summary.events.length}, ${method}`);
+                    message.log.messages.events.push(parsed);
+                    message.log.messages_summary.events.push(`${message.log.messages_summary.events.length}, ${method}`);
                     if (method === "Page.domContentEventFired") {
                         // inject code into next requested page
                         message.targets.page[message.activePage].ready = false;
@@ -194,6 +194,8 @@ const message:messageModule = {
                     }
                 }
             };
+        
+        message.log.options = config.options;
 
         // the interval ensures that logs are written even if the application cannot close on its own due to lost messaging
         interval = setInterval(function terminal_websites_message_application_interval():void {
@@ -240,14 +242,17 @@ const message:messageModule = {
 
     log: {
         devtool_targets: null,
-        events: [],
-        response: [],
-        sent: [],
-        summary: {
+        messages: {
             events: [],
             response: [],
             sent: []
-        }
+        },
+        messages_summary: {
+            events: [],
+            response: [],
+            sent: []
+        },
+        options: null
     },
 
     // ordered list of messages to send to the browser
@@ -255,8 +260,8 @@ const message:messageModule = {
 
     // sends a given message to the browser
     send: function terminal_websites_message_send():void {
-        message.log.sent.push(message.messageQueue[message.indexMessage]);
-        message.log.summary.sent.push(`${message.indexMessage}, ${message.messageQueue[message.indexMessage].method}`);
+        message.log.messages.sent.push(message.messageQueue[message.indexMessage]);
+        message.log.messages_summary.sent.push(`${message.indexMessage}, ${message.messageQueue[message.indexMessage].method}`);
         message.targets.page[message.activePage].ws.send(JSON.stringify(message.messageQueue[message.indexMessage]));
         if (message.messageQueue[message.indexMessage].method === "Page.addScriptToEvaluateOnNewDocument") {
             message.messageQueue[message.indexMessage].params = {};
@@ -345,6 +350,9 @@ const message:messageModule = {
 
     // write communication data to file
     writeLog: function terminal_websites_message_writeLog(callback:() => void):void {
+        message.targets.page.forEach(function terminal_websites_message_writeLog_pageSockets(target:targetListItem):void {
+            target.ws = null;
+        });
         writeFile(`${vars.projectPath}log.json`, JSON.stringify(message.log).replace(/"devtool_targets":null,/, `"devtool_targets":${JSON.stringify(message.targets)},`), "utf8", function terminal_websites_message_writeLog_callback():void {
             callback();
         });

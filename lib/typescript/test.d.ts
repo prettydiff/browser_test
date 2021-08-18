@@ -36,14 +36,17 @@ declare global {
     }
     interface messageLog {
         devtool_targets: targetList;
-        events: devtoolsParameters[];
-        response: devtoolsParameters[];
-        sent: messageItem[];
-        summary: {
+        messages: {
+            events: devtoolsParameters[];
+            response: devtoolsParameters[];
+            sent: messageItem[];
+        };
+        messages_summary: {
             events: string[];
             response: string[];
             sent: string[];
         };
+        options: websitesInput;
     }
     interface messageModule {
         activePage: number;
