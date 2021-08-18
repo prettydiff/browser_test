@@ -300,6 +300,50 @@ const demo:campaign = {
                     value: "A rewards bonus on eligible Bank of America credit cards."
                 }
             ]
+        },
+        {
+            delay: {
+                node: [
+                    ["getElementById", "enterID-input", null]
+                ],
+                qualifier: "is",
+                target: ["nodeName", "toLowerCase()"],
+                type: "property",
+                value: "input"
+            },
+            interaction: [
+                {
+                    event: "click",
+                    node: [
+                        ["getElementById", "enroll-sign-in-link", null]
+                    ]
+                }
+            ],
+            name: "Click the Sign In button",
+            page: 1,
+            unit: []
+        },
+        {
+            delay: {
+                node: [
+                    ["getElementById", "signInPartialContent", null],
+                    ["getElementsByTagName", "input", 0]
+                ],
+                qualifier: "is",
+                target: ["id"],
+                type: "attribute",
+                value: "onlineId1"
+            },
+            interaction: [
+                {
+                    event: "pageAddress",
+                    node: [],
+                    value: "https://www.bankofamerica.com/"
+                }
+            ],
+            name: "Move first tab to homepage",
+            page: 0,
+            unit: []
         }
     ]
 };
