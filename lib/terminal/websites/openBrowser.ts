@@ -73,7 +73,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
                 if (options.devtools === true) {
                     args.push("--auto-open-devtools-for-tabs");
                 }
-                args[args.indexOf("--profile-directory=\"\"")] = `--profile-directory=\"${profile}\"`;
+                args[args.indexOf("--profile-directory=\"\"")] = `--profile-directory="${profile}"`;
             } else {
                 if (options.devtools === true) {
                     args.push("--devtools");
