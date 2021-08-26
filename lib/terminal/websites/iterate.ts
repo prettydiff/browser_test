@@ -1,7 +1,6 @@
 
 /* lib/terminal/websites/iterate - Push the next test item. */
 
-import humanTime from "../utilities/humanTime.js";
 import log from "../utilities/log.js";
 import message from "./message.js";
 import vars from "../utilities/vars.js";
@@ -14,22 +13,6 @@ const iterate = function terminal_websites_iterate(noClose:boolean):void {
             `Test ${message.indexTest + 1} malformed: ${vars.text.angry + message.tests[message.indexTest].name + vars.text.none}`,
             ""
         ],
-        // check for a browser wait event in the current test
-        wait:number = (function terminal_websites_iterate_wait():number {
-            let a:number = message.tests[message.indexTest].interaction.length,
-                value:number = 0,
-                count:number = 0;
-            do {
-                a = a - 1;
-                if (message.tests[message.indexTest].interaction[a].event === "wait") {
-                    value = Number(message.tests[message.indexTest].interaction[a].value);
-                    if (isNaN(value) === false) {
-                        count = count + value;
-                    }
-                }
-            } while (a > 0);
-            return count;
-        }()),
         // determine if non-interactive events have required matching data properties
         validate = function terminal_websites_iterate_validate():boolean {
             let a:number = 0;
@@ -64,13 +47,6 @@ const iterate = function terminal_websites_iterate(noClose:boolean):void {
     if (validate() === true) {
         const prior:testBrowserEvent[] = message.tests[message.indexTest - 1].interaction;
         if (message.indexTest === 0 || (message.indexTest > 0 && (prior === null || prior.length === 0 || prior[0].event !== "refresh"))) {
-            if (wait > 0) {
-                const second:number = (wait / 1000),
-                    plural:string = (second === 1)
-                        ? ""
-                        : "s";
-                log([`${humanTime(false)}Delaying for ${vars.text.cyan + second + vars.text.none} second${plural}: ${vars.text.cyan} Pausing for 'wait' event in browser. ${vars.text.none}`]);
-            }
             message.sendTest(message.indexTest, false);
         }
     } else {

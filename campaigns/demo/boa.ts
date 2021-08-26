@@ -1,6 +1,6 @@
-// demo test campaign
+// bank of america demo test campaign
 
-const demo:campaign = {
+const boa:campaign = {
     // the initial page to load into the browser
     startPage: "https://promo.bankofamerica.com/advantage_banking/?cm_sp=DEP-Checking-_-NotAssigned-",
     options: {
@@ -348,4 +348,4 @@ const demo:campaign = {
     ]
 };
 
-export default demo;
+export default boa;

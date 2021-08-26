@@ -48,14 +48,14 @@ const test = function terminal_commands_test():void {
         }
         return defaultValue;
     },
-    campaignName:string = argv("campaign", "") as string;
+    campaignName:string = (argv("campaign", "") as string).replace(/\/|\\/g, vars.sep);
     vars.verbose = true;
 
     // evaluate if a campaign is specified
     if (campaignName === "") {
         error([
             `${vars.text.angry}A campaign name is required, but it is missing.${vars.text.none}`,
-            `Example: ${vars.text.cyan}drial websites campaign:demo${vars.text.none}`
+            `Example: ${vars.text.cyan}drial websites campaign:demo/boa${vars.text.none}`
         ], 1);
     }
 
@@ -66,7 +66,7 @@ const test = function terminal_commands_test():void {
     stat(`${configuration.campaignLocation + campaignName}.js`, function terminal_websites_index_campaign(err:Error):void {
         if (err === null) {
             // @ts-ignore - this is working correct because es2020 is set in the tsconfig, but the ide doesn't see it
-            import(`file:///${configuration.campaignLocation.replace(/\\/g, "/")}/${campaignName}.js`).then(function terminal_websites_index_campaign_promise(campaignData:campaignModule) {
+            import(`file:///${configuration.campaignLocation.replace(/\\/g, "/")}/${campaignName.replace(/\\/g, "/")}.js`).then(function terminal_websites_index_campaign_promise(campaignData:campaignModule) {
                 campaign = campaignData.default;
                 const options:websitesInput = {
                         browser: argv("browser", "") as string,
@@ -80,7 +80,7 @@ const test = function terminal_commands_test():void {
             });
         } else {
             error([
-                `${vars.text.angry}There is not a campaign file of name ${campaignName} in the campaigns directory.${vars.text.none}`
+                `There is ${vars.text.angry}not a campaign file of name ${campaignName + vars.text.none} in the campaigns directory: ${vars.text.cyan + configuration.campaignLocation + vars.text.none}`
             ], 1);
         }
     });

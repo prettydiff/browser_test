@@ -44,7 +44,7 @@ The tests specify locations in the browser using standard DOM methods and custom
 ## Demonstration using this application
 From the terminal use this command to run the browser test automation:
 
-`drial websites campaign:demo`
+`drial websites campaign:demo/boa`
 
 For options associated with any command please see the command documentation:
 

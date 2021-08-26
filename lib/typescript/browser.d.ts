@@ -16,7 +16,6 @@ interface Element {
 
 // remote
 interface module_remote {
-    action: testBrowserAction;
     delay: (config:testBrowserItem) => void;
     domFailure: boolean;
     error: (message:string, source:string, line:number, col:number, error:Error) => void;
@@ -30,8 +29,7 @@ interface module_remote {
     node: (dom:testBrowserDOM, property:string) => Element;
     parse: (testString:string) => void;
     report: (test:testBrowserTest[], index:number) => void;
-    send: (payload:[boolean, string, string][], index:number, task:testBrowserAction) => void;
-    serverPort: number;
+    send: (payload:[boolean, string, string][], index:number) => void;
     stringify: (primitive:primitive) => string;
 }
 // ------------------------------------

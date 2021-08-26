@@ -7,211 +7,207 @@ declare global {
     }
 }
 
-window.drialRemote = {
-
-    /* The action this module should take in response to test instructions from the terminal */
-    action: (function browser_remote_action():testBrowserAction {
-        // adds custom extensions to the DOM
-        {
-            // getAncestor - A method to walk up the DOM towards the documentElement.
-            // * identifier: string - The string value to search for.
-            // * selector: "class", "id", "name" - The part of the element to compare the identifier against.
-            const name = function browser_dom_name(item:Element):string {
-                    return item.nodeName.toLowerCase();
-                },
-                getAncestor = function browser_dom_getAncestor(identifier:string, selector:selector):Element {
-                    // eslint-disable-next-line
-                    let start:Element = (this === document) ? document.documentElement : this;
-                    const test = function browser_dom_getAncestor_test():boolean {
-                            if (selector === "class") {
-                                if (start.getAttribute("class") === identifier) {
-                                    return true;
-                                }
-                                return false;
-                            }
-                            if (selector === "id") {
-                                if (start.getAttribute("id") === identifier) {
-                                    return true;
-                                }
-                                return false;
-                            }
-                            if (name(start) === identifier) {
-                                return true;
-                            }
-                            return false;
-                        };
-                    if (start === null || start === undefined) {
-                        return null;
-                    }
-                    if (start === document.documentElement || test() === true) {
-                        return start;
-                    }
-                    do {
-                        start = start.parentNode as Element;
-                        if (start === null) {
-                            return null;
+// custom DOM extensions
+{
+    // getAncestor - A method to walk up the DOM towards the documentElement.
+    // * identifier: string - The string value to search for.
+    // * selector: "class", "id", "name" - The part of the element to compare the identifier against.
+    const name = function browser_dom_name(item:Element):string {
+            return item.nodeName.toLowerCase();
+        },
+        getAncestor = function browser_dom_getAncestor(identifier:string, selector:selector):Element {
+            // eslint-disable-next-line
+            let start:Element = (this === document) ? document.documentElement : this;
+            const test = function browser_dom_getAncestor_test():boolean {
+                    if (selector === "class") {
+                        if (start.getAttribute("class") === identifier) {
+                            return true;
                         }
-                    } while (start !== document.documentElement && test() === false);
-                    return start;
-                },
-                // getElementByAttribute - Search all descendant elements containing a matching attribute with matching value and returns an array of corresponding elements.
-                // * name: string - The name of the attribute to search for.  An empty string means accept every attribute name.
-                // * value: string - The attribute value to search for.  An empty string means accept any attribute value.  
-                getElementsByAttribute = function browser_dom_getElementsByAttribute(name:string, value:string):Element[] {
-                    // eslint-disable-next-line
-                    const start:Element = (this === document) ? document.documentElement : this,
-                        attrs:Attr[]    = start.getNodesByType(2) as Attr[],
-                        out:Element[]   = [];
-                    if (typeof name !== "string") {
-                        name = "";
+                        return false;
                     }
-                    if (typeof value !== "string") {
-                        value = "";
-                    }
-                    attrs.forEach(function browser_dom_getElementsByAttribute_each(item:Attr):void {
-                        if (item.name === name || name === "") {
-                            if (item.value === value || value === "") {
-                                out.push(item.ownerElement);
-                            }
+                    if (selector === "id") {
+                        if (start.getAttribute("id") === identifier) {
+                            return true;
                         }
-                    });
-                    return out;
-                },
-                // getElementsByText - Returns an array of descendant elements containing the white space trimmed text.
-                // * textValue: string - The text to match.  The value must exactly match the complete text node value after trimming white space.
-                // * castSensitive: boolean - Whether case sensitivity should apply.
-                getElementsByText = function browser_dom_getElementsByText(textValue:string, caseSensitive?:boolean):Element[] {
-                    // eslint-disable-next-line
-                    const start:Element = (this === document) ? document.documentElement : this,
-                        texts:Text[]    = start.getNodesByType(3) as Text[],
-                        out:Element[]   = [];
-                    if (typeof textValue !== "string") {
-                        textValue = "";
-                    } else {
-                        textValue = textValue.replace(/^\s+/, "").replace(/\s+$/, "");
+                        return false;
                     }
-                    if (typeof caseSensitive !== "boolean") {
-                        caseSensitive = false;
+                    if (name(start) === identifier) {
+                        return true;
                     }
-                    texts.forEach(function browser_dom_getElementsByText_each(item:Text):void {
-                        const text:string = (caseSensitive === true)
-                            ? item.textContent.toLowerCase()
-                            : item.textContent;
-                        if (textValue === "" && text.replace(/\s+/, "") !== "") {
-                            out.push(item.parentElement);
-                        } else if (textValue !== "" && text.replace(/^\s+/, "").replace(/\s+$/, "") === textValue) {
-                            out.push(item.parentElement);
-                        }
-                    });
-                    return out;
-                },
-                // getNodesByType - Returns an array of DOM nodes matching the provided node type.
-                // * typeValue: string|number = The value must be a node type name or a node type number (0-12)
-                // - An empty string, "all", or 0 means gather all descendant nodes regardless of type.
-                // - For standard values see: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
-                getNodesByType = function browser_dom_getNodesByType(typeValue:number|string):Node[] {
-                    const valueString:string = (typeof typeValue === "string") ? typeValue.toLowerCase().replace(/_node$/, "") : "",
-                        // eslint-disable-next-line
-                        root:Element = (this === document) ? document.documentElement : this,
-                        numb:number = (isNaN(Number(typeValue)) === false)
-                            ? Number(typeValue)
-                            : 0;
-                    let types:number = (numb > 12 || numb < 0)
-                        ? 0
-                        : Math.round(numb);
-
-                    // If input is a string and supported standard value
-                    // associate to the standard numeric type
-                    if (valueString === "all" || typeValue === "") {
-                        types = 0;
-                    } else if (valueString === "element") {
-                        types = 1;
-                    } else if (valueString === "attribute") {
-                        types = 2;
-                    } else if (valueString === "text") {
-                        types = 3;
-                    } else if (valueString === "cdata_section") {
-                        types = 4;
-                    } else if (valueString === "entity_reference") {
-                        types = 5;
-                    } else if (valueString === "entity") {
-                        types = 6;
-                    } else if (valueString === "processing_instruction") {
-                        types = 7;
-                    } else if (valueString === "comment") {
-                        types = 8;
-                    } else if (valueString === "document") {
-                        types = 9;
-                    } else if (valueString === "document_type") {
-                        types = 10;
-                    } else if (valueString === "document_fragment") {
-                        types = 11;
-                    } else if (valueString === "notation") {
-                        types = 12;
-                    }
-
-                    // A handy dandy function to trap all the DOM walking
-                    return (function browser_dom_getNodesByType_walking():Node[] {
-                        const output:Node[] = [],
-                            child  = function browser_dom_getNodesByType_walking_child(x:Element):void {
-                                const children:NodeListOf<ChildNode> = x.childNodes;
-                                let a:NamedNodeMap    = x.attributes,
-                                    b:number    = a.length,
-                                    c:number    = 0;
-                                // Special functionality for attribute types.
-                                if (b > 0 && (types === 2 || types === 0)) {
-                                    do {
-                                        output.push(a[c]);
-                                        c = c + 1;
-                                    } while (c < b);
-                                }
-                                b = children.length;
-                                c = 0;
-                                if (b > 0) {
-                                    do {
-                                        if (children[c].nodeType === types || types === 0) {
-                                            output.push(children[c] as Element);
-                                        }
-                                        if (children[c].nodeType === 1) {
-                                            //recursion magic
-                                            browser_dom_getNodesByType_walking_child(children[c] as Element);
-                                        }
-                                        c = c + 1;
-                                    } while (c < b);
-                                }
-                            };
-                        child(root);
-                        return output;
-                    }());
+                    return false;
                 };
+            if (start === null || start === undefined) {
+                return null;
+            }
+            if (start === document.documentElement || test() === true) {
+                return start;
+            }
+            do {
+                start = start.parentNode as Element;
+                if (start === null) {
+                    return null;
+                }
+            } while (start !== document.documentElement && test() === false);
+            return start;
+        },
+        // getElementByAttribute - Search all descendant elements containing a matching attribute with matching value and returns an array of corresponding elements.
+        // * name: string - The name of the attribute to search for.  An empty string means accept every attribute name.
+        // * value: string - The attribute value to search for.  An empty string means accept any attribute value.  
+        getElementsByAttribute = function browser_dom_getElementsByAttribute(name:string, value:string):Element[] {
+            // eslint-disable-next-line
+            const start:Element = (this === document) ? document.documentElement : this,
+                attrs:Attr[]    = start.getNodesByType(2) as Attr[],
+                out:Element[]   = [];
+            if (typeof name !== "string") {
+                name = "";
+            }
+            if (typeof value !== "string") {
+                value = "";
+            }
+            attrs.forEach(function browser_dom_getElementsByAttribute_each(item:Attr):void {
+                if (item.name === name || name === "") {
+                    if (item.value === value || value === "") {
+                        out.push(item.ownerElement);
+                    }
+                }
+            });
+            return out;
+        },
+        // getElementsByText - Returns an array of descendant elements containing the white space trimmed text.
+        // * textValue: string - The text to match.  The value must exactly match the complete text node value after trimming white space.
+        // * castSensitive: boolean - Whether case sensitivity should apply.
+        getElementsByText = function browser_dom_getElementsByText(textValue:string, caseSensitive?:boolean):Element[] {
+            // eslint-disable-next-line
+            const start:Element = (this === document) ? document.documentElement : this,
+                texts:Text[]    = start.getNodesByType(3) as Text[],
+                out:Element[]   = [];
+            if (typeof textValue !== "string") {
+                textValue = "";
+            } else {
+                textValue = textValue.replace(/^\s+/, "").replace(/\s+$/, "");
+            }
+            if (typeof caseSensitive !== "boolean") {
+                caseSensitive = false;
+            }
+            texts.forEach(function browser_dom_getElementsByText_each(item:Text):void {
+                const text:string = (caseSensitive === true)
+                    ? item.textContent.toLowerCase()
+                    : item.textContent;
+                if (textValue === "" && text.replace(/\s+/, "") !== "") {
+                    out.push(item.parentElement);
+                } else if (textValue !== "" && text.replace(/^\s+/, "").replace(/\s+$/, "") === textValue) {
+                    out.push(item.parentElement);
+                }
+            });
+            return out;
+        },
+        // getNodesByType - Returns an array of DOM nodes matching the provided node type.
+        // * typeValue: string|number = The value must be a node type name or a node type number (0-12)
+        // - An empty string, "all", or 0 means gather all descendant nodes regardless of type.
+        // - For standard values see: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+        getNodesByType = function browser_dom_getNodesByType(typeValue:number|string):Node[] {
+            const valueString:string = (typeof typeValue === "string") ? typeValue.toLowerCase().replace(/_node$/, "") : "",
+                // eslint-disable-next-line
+                root:Element = (this === document) ? document.documentElement : this,
+                numb:number = (isNaN(Number(typeValue)) === false)
+                    ? Number(typeValue)
+                    : 0;
+            let types:number = (numb > 12 || numb < 0)
+                ? 0
+                : Math.round(numb);
 
-            // Create a document method
-            if (document.getElementsByAttribute === undefined) {
-                document.getElementsByAttribute = getElementsByAttribute;
-            }
-            if (document.getNodesByType === undefined) {
-                document.getNodesByType         = getNodesByType;
-            }
-            if (document.getElementsByText === undefined) {
-                document.getElementsByText      = getElementsByText;
+            // If input is a string and supported standard value
+            // associate to the standard numeric type
+            if (valueString === "all" || typeValue === "") {
+                types = 0;
+            } else if (valueString === "element") {
+                types = 1;
+            } else if (valueString === "attribute") {
+                types = 2;
+            } else if (valueString === "text") {
+                types = 3;
+            } else if (valueString === "cdata_section") {
+                types = 4;
+            } else if (valueString === "entity_reference") {
+                types = 5;
+            } else if (valueString === "entity") {
+                types = 6;
+            } else if (valueString === "processing_instruction") {
+                types = 7;
+            } else if (valueString === "comment") {
+                types = 8;
+            } else if (valueString === "document") {
+                types = 9;
+            } else if (valueString === "document_type") {
+                types = 10;
+            } else if (valueString === "document_fragment") {
+                types = 11;
+            } else if (valueString === "notation") {
+                types = 12;
             }
 
-            // Ensure dynamically created elements get these methods too
-            if (Element.prototype.getAncestor === undefined) {
-                Element.prototype.getAncestor            = getAncestor;
-            }
-            if (Element.prototype.getElementsByAttribute === undefined) {
-                Element.prototype.getElementsByAttribute = getElementsByAttribute;
-            }
-            if (Element.prototype.getNodesByType === undefined) {
-                Element.prototype.getNodesByType         = getNodesByType;
-            }
-            if (Element.prototype.getElementsByText === undefined) {
-                Element.prototype.getElementsByText      = getElementsByText;
-            }
-        }
-        return "result";
-    }()),
+            // A handy dandy function to trap all the DOM walking
+            return (function browser_dom_getNodesByType_walking():Node[] {
+                const output:Node[] = [],
+                    child  = function browser_dom_getNodesByType_walking_child(x:Element):void {
+                        const children:NodeListOf<ChildNode> = x.childNodes;
+                        let a:NamedNodeMap    = x.attributes,
+                            b:number    = a.length,
+                            c:number    = 0;
+                        // Special functionality for attribute types.
+                        if (b > 0 && (types === 2 || types === 0)) {
+                            do {
+                                output.push(a[c]);
+                                c = c + 1;
+                            } while (c < b);
+                        }
+                        b = children.length;
+                        c = 0;
+                        if (b > 0) {
+                            do {
+                                if (children[c].nodeType === types || types === 0) {
+                                    output.push(children[c] as Element);
+                                }
+                                if (children[c].nodeType === 1) {
+                                    //recursion magic
+                                    browser_dom_getNodesByType_walking_child(children[c] as Element);
+                                }
+                                c = c + 1;
+                            } while (c < b);
+                        }
+                    };
+                child(root);
+                return output;
+            }());
+        };
+
+    // Create a document method
+    if (document.getElementsByAttribute === undefined) {
+        document.getElementsByAttribute = getElementsByAttribute;
+    }
+    if (document.getNodesByType === undefined) {
+        document.getNodesByType         = getNodesByType;
+    }
+    if (document.getElementsByText === undefined) {
+        document.getElementsByText      = getElementsByText;
+    }
+
+    // Ensure dynamically created elements get these methods too
+    if (Element.prototype.getAncestor === undefined) {
+        Element.prototype.getAncestor            = getAncestor;
+    }
+    if (Element.prototype.getElementsByAttribute === undefined) {
+        Element.prototype.getElementsByAttribute = getElementsByAttribute;
+    }
+    if (Element.prototype.getNodesByType === undefined) {
+        Element.prototype.getNodesByType         = getNodesByType;
+    }
+    if (Element.prototype.getElementsByText === undefined) {
+        Element.prototype.getElementsByText      = getElementsByText;
+    }
+}
+
+window.drialRemote = {
 
     /* Executes the delay test unit if a given test has a delay property */
     delay: function browser_remote_delay(config:testBrowserItem):void {
@@ -224,7 +220,7 @@ window.drialRemote = {
                     if (config.unit.length > 0) {
                         window.drialRemote.report(config.unit, window.drialRemote.index);
                     } else {
-                        window.drialRemote.send([testResult], window.drialRemote.index, window.drialRemote.action);
+                        window.drialRemote.send([testResult], window.drialRemote.index);
                     }
                     return;
                 }
@@ -233,7 +229,7 @@ window.drialRemote = {
                     window.drialRemote.send([
                         [false, "delay timeout", config.delay.node.nodeString],
                         window.drialRemote.evaluate(config.delay)
-                    ], window.drialRemote.index, window.drialRemote.action);
+                    ], window.drialRemote.index);
                     return;
                 }
                 setTimeout(browser_remote_delay_timeout, delay);
@@ -261,7 +257,7 @@ window.drialRemote = {
             stack: (error === null)
                 ? null
                 : error.stack
-        }), "error"]], window.drialRemote.index, window.drialRemote.action);
+        }), "error"]], window.drialRemote.index);
     },
 
     /* Determine whether a given test item is pass or fail */
@@ -338,7 +334,7 @@ window.drialRemote = {
                         if (typeof config.value !== "string") {
                             window.drialRemote.send([
                                 [false, "event pageAddress requires a value property", null]
-                            ], item.index, item.action);
+                            ], item.index);
                             return;
                         }
                         location.href = config.value;
@@ -370,7 +366,7 @@ window.drialRemote = {
                         if (config.coords === undefined || config.coords === null || config.coords.length !== 2 || isNaN(Number(config.coords[0])) === true || isNaN(Number(config.coords[0])) === true) {
                             window.drialRemote.send([
                                 [false, `event error ${String(element)}`, config.node.nodeString]
-                            ], item.index, item.action);
+                            ], item.index);
                             return;
                         }
                         window.resizeTo(Number(config.coords[0]), Number(config.coords[1]));
@@ -383,7 +379,7 @@ window.drialRemote = {
                         if (element === null || element === undefined) {
                             window.drialRemote.send([
                                 [false, `event error ${String(element)}`, config.node.nodeString]
-                            ], item.index, item.action);
+                            ], item.index);
                             return;
                         }
                         if (config.event === "move") {
@@ -466,10 +462,6 @@ window.drialRemote = {
             eventLength:number = (item.test.interaction === null)
                 ? 0
                 : item.test.interaction.length;
-        if (item.action === "nothing") {
-            return;
-        }
-        window.drialRemote.action = item.action;
         window.drialRemote.index = item.index;
         if (eventLength < 1) {
             if (item.test.delay === undefined) {
@@ -633,7 +625,7 @@ window.drialRemote = {
         if (fail !== "") {
             window.drialRemote.send([
                 [false, fail, dom.nodeString]
-            ], window.drialRemote.index, window.drialRemote.action);
+            ], window.drialRemote.index);
             window.drialRemote.domFailure = true;
             return null;
         }
@@ -641,8 +633,8 @@ window.drialRemote = {
     },
 
     parse: function browser_remote_parse(testString:string):boolean {
-        if (typeof testString === "string" && (/^\s*\{\s*"(action)"\s*:/).test(testString) === true) {
-            const route:testBrowserRoute = JSON.parse(testString);
+        if (typeof testString === "string" && (/"(result)"\s*:\s*null/).test(testString) === true) {
+            const route:testBrowserRoute = JSON.parse(testString);console.log(route);
             if (route.index > window.drialRemote.index) {
                 window.drialRemote.event(route, false);
             }
@@ -667,13 +659,12 @@ window.drialRemote = {
                 }
                 a = a + 1;
             } while (a < length);
-            window.drialRemote.send(result, index, window.drialRemote.action);
+            window.drialRemote.send(result, index);
         }
     },
 
-    send: function browser_remote_send(payload:[boolean, string, string][], index:number, task:testBrowserAction):void {
+    send: function browser_remote_send(payload:[boolean, string, string][], index:number):void {
         const report:testBrowserRoute = {
-            action: task,
             exit: null,
             index: index,
             result: payload,
@@ -689,9 +680,6 @@ window.drialRemote = {
         // eslint-disable-next-line
         console.log(`Drial - report:${JSON.stringify(report)}`);
     },
-
-    /* The random port of the locally running http service*/
-    serverPort: 0,
 
     /* Converts a primitive of any type into a string for presentation */
     stringify: function browser_remote_raw(primitive:primitive):string {

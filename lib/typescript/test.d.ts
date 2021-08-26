@@ -94,7 +94,6 @@ declare global {
         unit: testBrowserTest[];
     }
     interface testBrowserRoute {
-        action: testBrowserAction;
         exit: string;
         index: number;
         result: [boolean, string, string][];

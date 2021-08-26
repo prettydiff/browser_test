@@ -55,7 +55,7 @@ const openBrowser = function terminal_websites_openBrowser(campaign:campaign, op
         // open a browser in the OS with its appropriate flags and port number
         args = (function terminal_websites_openBrowser_chrome():string[] {
             const args:string[] = configuration.browser.args[options.browser],
-                profile:string = options.campaignName.replace(/<>\\\/":\|\?\*[\u0000-\u0020][\u007f-\u009f]/g, "");
+                profile:string = options.campaignName.replace(/<>\\\/":\|\?\*[\u0000-\u0020][\u007f-\u009f]/g, "").replace(/\\|\//g, "-");
             // unsupported browser
             if (args === undefined || configuration.browser.executable[options.browser] === undefined || configuration.browser.executable[options.browser] === "") {
                 error([

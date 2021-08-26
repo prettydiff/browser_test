@@ -5,6 +5,8 @@ import { readFile, writeFile } from "fs";
 import { Protocol } from "devtools-protocol";
 
 import error from "../utilities/error.js";
+import humanTime from "../utilities/humanTime.js";
+import log from "../utilities/log.js";
 import results from "./results.js";
 import vars from "../utilities/vars.js";
 
@@ -13,7 +15,8 @@ import WebSocket from "../../ws-es6/index.js";
 
 let sendMessage:boolean = false,
     now:number = Date.now(),
-    interval:NodeJS.Timeout = null;
+    interval:NodeJS.Timeout = null,
+    testSent:boolean = false;
 const message:messageModule = {
     activePage: 0,
 
@@ -85,16 +88,20 @@ const message:messageModule = {
             },
             pageReady = function terminal_websites_message_application_pageReady(id:string):void {
                 let a:number = message.targets.page.length;
+
+                // this flag is necessary to prevent confusion browser open to page refresh
+                const refresh:boolean = (testSent === true);
                 do {
                     a = a - 1;
                     if (message.targets.page[a].id === id) {
                         message.targets.page[a].ready = true;
                         if (a === message.activePage) {
-                            message.sendTest(message.indexTest, true);
+                            message.sendTest(message.indexTest, refresh);
                         }
                         return;
                     }
                 } while (a > 0);
+                testSent = true;
             },
             wsMessage = function terminal_websites_message_application_wsMessage(data:string):void {
                 const parsed:devtoolsParameters = JSON.parse(data),
@@ -260,11 +267,13 @@ const message:messageModule = {
 
     // sends a given message to the browser
     send: function terminal_websites_message_send():void {
-        message.log.messages.sent.push(message.messageQueue[message.indexMessage]);
-        message.log.messages_summary.sent.push(`${message.indexMessage}, ${message.messageQueue[message.indexMessage].method}`);
-        message.targets.page[message.activePage].ws.send(JSON.stringify(message.messageQueue[message.indexMessage]));
-        if (message.messageQueue[message.indexMessage].method === "Page.addScriptToEvaluateOnNewDocument") {
-            message.messageQueue[message.indexMessage].params = {};
+        if (message.targets.page[message.activePage].ws !== null) {
+            message.log.messages.sent.push(message.messageQueue[message.indexMessage]);
+            message.log.messages_summary.sent.push(`${message.indexMessage}, ${message.messageQueue[message.indexMessage].method}`);
+            message.targets.page[message.activePage].ws.send(JSON.stringify(message.messageQueue[message.indexMessage]));
+            if (message.messageQueue[message.indexMessage].method === "Page.addScriptToEvaluateOnNewDocument") {
+                message.messageQueue[message.indexMessage].params = {};
+            }
         }
     },
 
@@ -295,12 +304,31 @@ const message:messageModule = {
     // queue a test into the message queue
     sendTest: function terminal_websites_message_sendTest(index:number, refresh:boolean):void {
         const route:testBrowserRoute = {
-            action: "result",
             exit: null,
             index: index,
             result: null,
             test: message.tests[index]
-        };
+        },
+        // check for a browser wait event in the current test
+        wait:number = (function terminal_websites_iterate_wait():number {
+            let a:number = (message.tests[message.indexTest].interaction === null)
+                    ? 0
+                    : message.tests[message.indexTest].interaction.length,
+                value:number = 0,
+                count:number = 0;
+            if (a > 0) {
+                do {
+                    a = a - 1;
+                    if (message.tests[message.indexTest].interaction[a].event === "wait") {
+                        value = Number(message.tests[message.indexTest].interaction[a].value);
+                        if (isNaN(value) === false) {
+                            count = count + value;
+                        }
+                    }
+                } while (a > 0);
+            }
+            return count;
+        }());
         message.indexTest = index;
         if (message.activePage !== message.tests[index].page) {
             // ensure a different page is active and visible
@@ -309,6 +337,12 @@ const message:messageModule = {
         if (refresh === true) {
             // an interaction that triggers a page refresh must be set to null to avoid a loop
             route.test.interaction = null;
+        } else if (wait > 0) {
+            const second:number = (wait / 1000),
+                plural:string = (second === 1)
+                    ? ""
+                    : "s";
+            log([`${humanTime(false)}Delaying for ${vars.text.cyan + second + vars.text.none} second${plural}: ${vars.text.cyan} Pausing for 'wait' event in browser. ${vars.text.none}`]);
         }
         // send the current test to the browser
         message.sendToQueue("Runtime.evaluate", {
