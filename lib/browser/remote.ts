@@ -263,7 +263,7 @@ window.drialRemote = {
     /* Determine whether a given test item is pass or fail */
     evaluate: function browser_remote_evaluate(test:testBrowserTest):[boolean, string, string] {
         const rawValue:Element|primitive = (test.type === "element")
-                ? window.drialRemote.node(test.node, test.target[0])
+                ? window.drialRemote.node(test.node, test.target[0]) as Element
                 : window.drialRemote.getProperty(test),
             qualifier:qualifier = test.qualifier,
             configString:string = test.value as string;
@@ -318,7 +318,6 @@ window.drialRemote = {
                 let element:HTMLElement,
                     config:testBrowserEvent,
                     htmlElement:HTMLInputElement,
-                    event:Event,
                     delay:number;
                 do {
                     config = item.test.interaction[index];
@@ -428,20 +427,20 @@ window.drialRemote = {
                                         window.drialRemote.keyShift = false;
                                     }
                                 } else {
-                                    const tabIndex:number = element.tabIndex;
-                                    event = new KeyboardEvent(config.event, {
-                                        key: config.value,
-                                        altKey: window.drialRemote.keyAlt,
-                                        ctrlKey: window.drialRemote.keyControl,
-                                        shiftKey: window.drialRemote.keyShift
-                                    });
+                                    const tabIndex:number = element.tabIndex,
+                                        event:KeyboardEvent = new KeyboardEvent(config.event, {
+                                            key: config.value,
+                                            altKey: window.drialRemote.keyAlt,
+                                            ctrlKey: window.drialRemote.keyControl,
+                                            shiftKey: window.drialRemote.keyShift
+                                        });
                                     element.tabIndex = 0;
                                     element.dispatchEvent(new Event("focus"));
                                     element.dispatchEvent(event);
                                     element.tabIndex = tabIndex;
                                 }
                             } else if (config.event === "click" || config.event === "contextmenu" || config.event === "dblclick" || config.event === "mousedown" || config.event === "mouseenter" || config.event === "mouseleave" || config.event === "mousemove" || config.event === "mouseout" || config.event === "mouseover" || config.event === "mouseup" || config.event === "touchend" || config.event === "touchstart") {
-                                event = new MouseEvent(config.event, {
+                                const event:MouseEvent = new MouseEvent(config.event, {
                                     altKey: window.drialRemote.keyAlt,
                                     ctrlKey: window.drialRemote.keyControl,
                                     shiftKey: window.drialRemote.keyShift
@@ -449,7 +448,7 @@ window.drialRemote = {
                                 event.initEvent(config.event, true, true);
                                 element.dispatchEvent(event);
                             } else {
-                                event = document.createEvent("Event");
+                                const event:Event = document.createEvent("Event");
                                 event.initEvent(config.event, true, true);
                                 element.dispatchEvent(event);
                             }
@@ -487,9 +486,9 @@ window.drialRemote = {
 
     /* Get the value of the specified property/attribute */
     getProperty: function browser_remote_getProperty(test:testBrowserTest):primitive {
-        const element:Element = (test.node.length > 0)
-                ? window.drialRemote.node(test.node, test.target[0])
-                : null,
+        const element:Element = (test.node === null || test.node.length === 0)
+                ? null
+                : window.drialRemote.node(test.node, test.target[0]) as Element,
             pLength = test.target.length - 1,
             method = function browser_remote_getProperty_method(prop:Object, name:string):primitive {
                 if (name.slice(name.length - 2) === "()") {
@@ -500,7 +499,7 @@ window.drialRemote = {
                 // @ts-ignore - prop is some unknown DOM element or element property
                 return prop[name];
             },
-            property = function browser_remote_getProperty_property(origin:Element|Window):primitive {
+            property = function browser_remote_getProperty_property(origin:Document|Element|Window):primitive {
                 let b:number = 1,
                     item:Object = method(origin, test.target[0]);
                 if (pLength > 1) {
@@ -516,6 +515,9 @@ window.drialRemote = {
         }
         if (test.target[0] === "window") {
             return property(window);
+        }
+        if (test.target[0] === "document") {
+            return property(document);
         }
         if (element === null) {
             return null;
@@ -543,7 +545,7 @@ window.drialRemote = {
     keyShift: false,
 
     /* Gather a DOM node using instructions from a data structure */
-    node: function browser_remote_node(dom:testBrowserDOM, property:string):Element {
+    node: function browser_remote_node(dom:testBrowserDOM, property:string):Document|Element|Window {
         let element:Document|Element = document,
             node:[domMethod, string, number],
             a:number = 0,
@@ -552,6 +554,14 @@ window.drialRemote = {
             str:string[] = ["document"];
         if (dom === null || dom === undefined) {
             return null;
+        }
+        if (dom[0][0] === "document") {
+            dom.nodeString = "document";
+            return document;
+        }
+        if (dom[0][0] === "window") {
+            dom.nodeString = "window";
+            return window;
         }
         do {
             node = dom[a];
@@ -634,7 +644,7 @@ window.drialRemote = {
 
     parse: function browser_remote_parse(testString:string):boolean {
         if (typeof testString === "string" && (/"(result)"\s*:\s*null/).test(testString) === true) {
-            const route:testBrowserRoute = JSON.parse(testString);console.log(route);
+            const route:testBrowserRoute = JSON.parse(testString);
             if (route.index > window.drialRemote.index) {
                 window.drialRemote.event(route, false);
             }

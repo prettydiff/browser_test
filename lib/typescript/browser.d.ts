@@ -26,7 +26,7 @@ interface module_remote {
     keyAlt: boolean;
     keyControl: boolean;
     keyShift: boolean;
-    node: (dom:testBrowserDOM, property:string) => Element;
+    node: (dom:testBrowserDOM, property:string) => Document|Element|Window;
     parse: (testString:string) => void;
     report: (test:testBrowserTest[], index:number) => void;
     send: (payload:[boolean, string, string][], index:number) => void;
